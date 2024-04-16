@@ -8,17 +8,39 @@ from rest_framework import status
 from rest_framework.response import Response
 from django.http import HttpResponse
 from .utils import add_children
-from rest_framework.decorators import api_view
 
-def add_children_view():
+
+def add_children_view(request):
     add_children()
     return HttpResponse("Przykładowe dane zostały dodane do bazy.")
 
-@api_view(['GET'])
-def get_children_view(request):
-    children = Children.objects.all()
-    serializer = ChildrenSerializer(children, many=True)
-    return Response(serializer.data)
+
+class ChildrenView(APIView):
+    def post(self, request, format=None):
+        print("dane z request z post: ", request.data)
+        serializer = ChildrenSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            print("serializer z post: ", serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# class ChildrenView(APIView):
+#     def post(self, request, format=None):
+#         serializer = ChildrenSerializer(data=request.data)
+#         if serializer.is_valid():
+#             # Obsługa przesłanego pliku
+#             if 'image' in request.FILES:
+#                 serializer.save(image=request.FILES['image'])  # Zapisz przesłane zdjęcie do pola image w modelu Child
+#             else:
+#                 serializer.save()  # Zapisz dane dziecka (bez zdjęcia)
+
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request, format=None):
+        children = Children.objects.all()
+        serializer = ChildrenSerializer(children, many=True)
+        return Response(serializer.data)
+
 
 
 class HomeView(APIView):

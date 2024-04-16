@@ -83,7 +83,7 @@ const ChildrenContent = ({ onAddChild }: { onAddChild: () => void }) => {
     ]);
 
     useEffect(() => {
-        axios.get('/api/children')
+        axios.get('/api/addChild/')
         .then(response => {
             setChildren(response.data);
         })
