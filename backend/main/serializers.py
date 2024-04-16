@@ -62,3 +62,8 @@ class ChildrenSerializer(serializers.ModelSerializer):
     class Meta:
         model = Children
         fields = '__all__'
+
+    def create(self, vaidated_data):
+        children = Children.objects.create(**vaidated_data)
+        print("children z create: ", children)
+        return children
