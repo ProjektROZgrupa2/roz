@@ -15,3 +15,4 @@ class ChildrenAdmin(admin.ModelAdmin):
 
 admin.site.register(Main, MainAdmin)
 admin.site.register(Children, ChildrenAdmin)
+
