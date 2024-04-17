@@ -66,32 +66,21 @@ const useStyles = createUseStyles({
     },
 });
 
-const ChildrenContent = ({ onAddChild }: { onAddChild: () => void }) => {
+
+const ChildrenContent = ({ refreshKey, onAddChild }: { refreshKey: number, onAddChild: () => void }) => {
     const classes = useStyles();
 
-    const [children, setChildren] = useState([
-        { id: 1, name: 'Jan', surname: 'Nowak', age: 10 },
-        { id: 2, name: 'Anna', surname: 'Nowak', age: 12 },
-        { id: 3, name: 'Karolina', surname: 'Nowak', age: 12 },
-        { id: 4, name: 'Michał', surname: 'Nowak', age: 12 },
-        { id: 5, name: 'Joanna', surname: 'Nowak', age: 12 },
-        { id: 6, name: 'Ola', surname: 'Nowak', age: 12 },
-        { id: 7, name: 'Piotr', surname: 'Nowak', age: 12 },
-        { id: 8, name: 'Jakub', surname: 'Nowak', age: 12 },
-        { id: 9, name: 'Kasia', surname: 'Nowak', age: 12 },
-        { id: 10, name: 'Mariusz', surname: 'Nowak', age: 12 },
-    ]);
+    const [children, setChildren] = useState([]);
 
     useEffect(() => {
-        axios.get('/api/addChild/')
+        axios.get('http://localhost:8000/api/addChild/')
         .then(response => {
             setChildren(response.data);
         })
         .catch(error => {
             console.error('Błąd pobierania listy dzieci:', error);
         });
-    }, []);
-
+    }, [refreshKey]);
 
     const handleDeleteChild = () => {
         //TODO
@@ -108,7 +97,7 @@ const ChildrenContent = ({ onAddChild }: { onAddChild: () => void }) => {
                         <h2>{child.name} {child.surname}</h2>
                         <p>Wiek: {child.age}</p>
                         <div className={classes.buttons}>
-                            <button className={classes.button} onClick={handleDeleteChild}>Usuń</button>
+                            <button className={classes.button}>Usuń</button>
                             <button className={classes.button}>Szczegóły</button>
                         </div>
                     </div>

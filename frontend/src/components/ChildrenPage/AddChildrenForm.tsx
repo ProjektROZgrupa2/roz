@@ -62,7 +62,7 @@ const customModalStyles = {
     },
 };
 
-const AddChildrenForm = ( { isOpen, onClose }: { isOpen: boolean, onClose: () => void } ) => {
+const AddChildrenForm = ( { isOpen, onClose, onChildAdded }: { isOpen: boolean, onClose: () => void, onChildAdded: () => void } ) => {
     const classes = useStyles();
     const { register, handleSubmit, formState: { errors }, reset } = useForm();
     const [page, setPage] = useState(1);
@@ -73,6 +73,7 @@ const AddChildrenForm = ( { isOpen, onClose }: { isOpen: boolean, onClose: () =>
             console.log('Dziecko zostało dodane:', response.data);
             reset();
             onClose();
+            onChildAdded();
           })
           .catch(error => {
             console.error('Błąd podczas dodawania dziecka:', error);
