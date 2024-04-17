@@ -1,6 +1,6 @@
 from django.urls import path
 from main import views
-
+from .views import google_login
 
 urlpatterns = [
     path('', views.HomeView.as_view(), name='home'),
@@ -11,4 +11,5 @@ urlpatterns = [
     path('api/main/<int:pk>/', views.MainView.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='main-detail'),
     path('add_children/', views.add_children_view, name='add_children'),
     path('api/children/', views.get_children_view, name='get_children'),
+    path('accounts/google/login/', google_login, name='google_login'),
 ]

@@ -9,6 +9,9 @@ from rest_framework.response import Response
 from django.http import HttpResponse
 from .utils import add_children
 from rest_framework.decorators import api_view
+from django.http import HttpResponseRedirect
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount import providers
 
 def add_children_view():
     add_children()
@@ -69,5 +72,8 @@ class RegistrationView(views.APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
+    
+def google_login(request):
+    adapter = GoogleOAuth2Adapter()
+    provider = providers.registry.by_id(GoogleOAuth2Adapter.provider_id)
+    return adapter.view(request, *args, **kwargs)
