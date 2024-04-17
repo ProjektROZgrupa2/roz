@@ -31,12 +31,14 @@ const useStyles = createUseStyles({
         },
     },
     addButton: {
-        width: "200px",
+        width: "50px",
+
+        margin: "10px 0",
     },
     buttons: {
         display: 'flex',
-        justifyContent: 'center',
-        gap: '1rem',
+        flexDirection: 'row', 
+        justifyContent: 'space-between',
     },
     childrenGrid: {
         display: 'grid',
@@ -53,9 +55,47 @@ const useStyles = createUseStyles({
         gap: '1rem',
         padding: '1rem',
         backgroundColor: '#F0ECE5',
-        borderRadius: '5px',
-        boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.2)',
+        borderRadius: '10px', 
+        boxShadow: '0 0 15px 0 rgba(0, 0, 0, 0.1)', 
+        textAlign: 'center',
+        transition: 'transform 0.3s ease', 
+        "&:hover": {
+            transform: 'scale(1.05)',
+            boxShadow: '0 0 20px 0 rgba(0, 0, 0, 0.2)', 
+        },
     },
+    searchBar: {
+        width: '80%',
+        padding: '10px',
+        margin: '10px 0',
+        borderRadius: '5px',
+        border: 'none', 
+        boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.1)', 
+        fontSize: '1rem', 
+        transition: 'box-shadow 0.3s ease', 
+        '&:focus': {
+            outline: 'none', 
+            boxShadow: '0 0 15px 0 rgba(0, 0, 0, 0.2)', 
+        },
+    },
+    sortButton: {
+        width: "200px",
+        padding: "10px",
+        margin: "10px 0",
+        borderRadius: "5px",
+        border: "1px solid #ccc",
+        backgroundColor: "#31304D",
+        color: "white",
+        cursor: "pointer",
+        transition: "transform 0.3s ease",
+        "&:active": {
+            transform: "scale(0.95)",
+        },
+        "&:hover": {
+            backgroundColor: "#161A30",
+        },
+    },
+    
     '@media (max-width: 768px)': {
         childrenGrid: {
             gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -66,11 +106,40 @@ const useStyles = createUseStyles({
     },
 });
 
+interface Child {
+    id: number;
+    name: string;
+    surname: string;
+    dateOfBirth: string; 
+    image: string;
+    dateOfAdmission: string;
+}
+
+function calculateAge(dateOfBirth: string): number {
+    const dob = new Date(dateOfBirth);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (dob > today) {
+        return 0;}
+
+    let age = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+        age--;
+    }
+
+    return age;
+}
 
 const ChildrenContent = ({ refreshKey, onAddChild }: { refreshKey: number, onAddChild: () => void }) => {
     const classes = useStyles();
+    const [searchTerm, setSearchTerm] = useState(''); 
+    const [alphaSortOrder, setAlphaSortOrder] = useState(true);
+    const [sortOrder, setSortOrder] = useState(true); 
 
-    const [children, setChildren] = useState([]);
+    const [children, setChildren] = useState<Child[]>([]);
 
     useEffect(() => {
         axios.get('http://localhost:8000/api/addChild/')
@@ -82,22 +151,70 @@ const ChildrenContent = ({ refreshKey, onAddChild }: { refreshKey: number, onAdd
         });
     }, [refreshKey]);
 
-    const handleDeleteChild = () => {
-        //TODO
+    const handleSort = () => {
+        const sortedChildren = [...children].sort((a, b) => {
+            const ageA = calculateAge(a.dateOfBirth);
+            const ageB = calculateAge(b.dateOfBirth);
+            return sortOrder ? ageA - ageB : ageB - ageA;
+        });
+        setChildren(sortedChildren);
+        setSortOrder(!sortOrder);
+    };
+
+    const filteredChildren = children.filter(child =>
+        `${child.name} ${child.surname}`.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const handleAlphaSort = () => {
+        const sortedChildren = [...children].sort((a, b) => {
+            const surnameA = a.surname.toLowerCase();
+            const surnameB = b.surname.toLowerCase();
+            if (alphaSortOrder) {
+                if (surnameA < surnameB) return -1;
+                if (surnameA > surnameB) return 1;
+                return 0;
+            } else {
+                if (surnameA > surnameB) return -1;
+                if (surnameA < surnameB) return 1;
+                return 0;
+            }
+        });
+        setChildren(sortedChildren);
+        setAlphaSortOrder(!alphaSortOrder);
+    };
+
+    const handleDateSort = () => {
+        const sortedChildren = [...children].sort((a, b) => new Date(a.dateOfAdmission).getTime() - new Date(b.dateOfAdmission).getTime());
+        setChildren(sortedChildren);
     };
 
     return (
         <div className={classes.wrapper}>
-            <button className={`${classes.button} ${classes.addButton}`} onClick={onAddChild}>Dodaj dziecko</button>
             <h1>Lista dzieci</h1>
+            <input
+                type="text"
+                placeholder="Szukaj po imieniu lub nazwisku"
+                value={searchTerm}
+                onChange={event => setSearchTerm(event.target.value)}
+                className={classes.searchBar}
+            />
+            <div className={classes.buttons}>
+                <div>
+                    <button className={classes.sortButton} onClick={handleSort}>Sortuj po wieku</button>
+                    <button className={classes.sortButton} onClick={handleAlphaSort}>Sortuj alfabetycznie</button>
+                    <button className={classes.sortButton} onClick={handleDateSort}>Sortuj po dacie przyjęcia</button>
+                </div>
+                <div>
+                    <button className={`${classes.button} ${classes.addButton}`} onClick={onAddChild}>+</button>
+                </div>
+            </div>
             <div className={classes.childrenGrid}>
-                {children.map((child: any) => (
+                {filteredChildren.map(child => (
                     <div key={child.id} className={classes.childCard}>
                         <img src={child.image || defaultImage} alt={`${child.name} ${child.surname}`} />
                         <h2>{child.name} {child.surname}</h2>
-                        <p>Wiek: {child.age}</p>
+                        <p>Wiek: {calculateAge(child.dateOfBirth)}</p>
                         <div className={classes.buttons}>
-                            <button className={classes.button}>Usuń</button>
                             <button className={classes.button}>Szczegóły</button>
                         </div>
                     </div>
