@@ -45,10 +45,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'main',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
+    
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -66,8 +63,8 @@ MIDDLEWARE = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
     ],
 }
 
@@ -105,7 +102,9 @@ TEMPLATES = [
 # STATIC_URL jest używany do budowania adresów URL dla plików statycznych w aplikacji Django. Ustawiając go na /static/, mówisz Django, żeby serwował pliki statyczne z katalogu statycznego pod adresem URL rozpoczynającym się od /static/.
 
 WSGI_APPLICATION = 'backend.wsgi.application'
-
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -116,8 +115,8 @@ DATABASES = {
         'NAME': 'postgres',                      
         'USER': 'postgres',                      
         'PASSWORD': 'postgres',                  
-        'HOST': 'db_dev',                        # Host bazy danych (nazwa kontenera)
-        'PORT': '5432', 
+       'HOST': 'db_dev',                        # Host bazy danych (nazwa kontenera)
+       'PORT': '5432', 
     }
 }
 
@@ -185,13 +184,3 @@ ACCOUNT_AUTHENTICATION_METHOD = 'username'
 
 ACCOUNT_EMAIL_REQUIRED = False
 
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': ['profile', 'email'],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        },
-        'CLIENT_ID': '30859682066-1qjpd979d69plts4qbmkbc58nblh75n2.apps.googleusercontent.com',
-        'SECRET': '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',
-    }
-}

@@ -6,11 +6,15 @@ import Login from "./container/Login";
 import Register from "./container/Register";
 import Children from './container/Children';
 import { useEffect, useState } from 'react';
+import { googleLogout } from '@react-oauth/google';
+import axios from 'axios';
+import { useGoogleLogin,UseGoogleLoginResponse } from 'react-google-login';
 
 
 const App = () => {
     const [isAuth, setIsAuth] = useState(false);
-
+    const [ user, setUser ] = useState([]);
+    const [ profile, setProfile ] = useState([]);
     useEffect(() => {
         const checkAuth = () => {
             if (localStorage.getItem('access_token') !== null) {
@@ -26,17 +30,20 @@ const App = () => {
             window.removeEventListener('storage', checkAuth);
         };
     }, []);
-
+    
+    
     return (
-        <Router>
-            <Routes>
-                <Route path="/" element={isAuth ? <Home /> : <LandingPage />} />
-                <Route path="/login" element={!isAuth ? <Login /> : <Home />} />
-                <Route path="/register" element={!isAuth ? <Register /> : <Home />} />
-                <Route path="/home" element={isAuth ? <Home /> : <LandingPage />} />
-                <Route path="/children" element={isAuth ? <Children /> : <LandingPage />} />
-            </Routes>
-        </Router>
+        
+            <Router>
+                <Routes>
+                    <Route path="/" element={isAuth ? <Home /> : <LandingPage />} />
+                    <Route path="/login" element={!isAuth ? <Login /> : <Home />} />
+                    <Route path="/register" element={!isAuth ? <Register /> : <Home />} />
+                    <Route path="/home" element={isAuth ? <Home /> : <LandingPage />} />
+                    <Route path="/children" element={isAuth ? <Children /> : <LandingPage />} />
+                </Routes>
+            </Router>
+           
     );
 }
 

@@ -4,7 +4,9 @@ import { FcGoogle } from 'react-icons/fc';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../../services/UserService';
-
+import { googleLogout } from '@react-oauth/google';
+import { GoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin,UseGoogleLoginResponse } from 'react-google-login';
 
 const useStyles = createUseStyles({
     form: {
@@ -82,6 +84,14 @@ const useStyles = createUseStyles({
 const Form = () => {
   const classes = useStyles();
   const navigate = useNavigate();
+  const responseMessage = (response) => {
+    console.log(response);
+};
+  const errorMessage = (error) => {
+    console.log(error);
+};
+
+  
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -164,8 +174,10 @@ const Form = () => {
               <button type="submit" className={classes.button}>
                 {isLoading ? 'Ładowanie...' : 'Zaloguj się'}
               </button>
+              
               <a href="http://localhost:8000/auth/google" className={classes.googleLogin}>
-                  <FcGoogle size={25} /> Zaloguj za pomocą Google
+                  <FcGoogle size={25} /> Zaloguj za pomocą Google 
+                  <GoogleLogin onSuccess={responseMessage} onError={errorMessage} /> 
               </a>
           </form>
       </div>
