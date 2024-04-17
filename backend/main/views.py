@@ -10,7 +10,7 @@ from django.http import HttpResponse
 from .utils import add_children
 from rest_framework.decorators import api_view
 
-def add_children_view():
+def add_children_view(request):
     add_children()
     return HttpResponse("Przykładowe dane zostały dodane do bazy.")
 
@@ -69,5 +69,6 @@ class RegistrationView(views.APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
