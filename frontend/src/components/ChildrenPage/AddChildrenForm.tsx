@@ -68,7 +68,7 @@ const AddChildrenForm = ( { isOpen, onClose }: { isOpen: boolean, onClose: () =>
     const [page, setPage] = useState(1);
 
     const onSubmit = (data : object) => {
-        axios.post('http://localhost:8001/api/addChild', data)
+        axios.post('http://localhost:8000/api/addChild/', data)
           .then(response => {
             console.log('Dziecko zostało dodane:', response.data);
             reset();
@@ -186,13 +186,13 @@ const AddChildrenForm = ( { isOpen, onClose }: { isOpen: boolean, onClose: () =>
                             errorMessage="To pole jest wymagane"
                             type="textarea"
                         />
-                        <InputField
+                        {/* <InputField
                             label="Zdjęcie"
-                            register={register('image', { required: true })}
+                            register={register('image', { required: false })}
                             error={!!errors.legalGuardian}
                             errorMessage="To pole jest wymagane"
                             type="file"
-                        />
+                        // /> */}
                         <div className={classes.buttonsContainer}>
                             <button type="button" className={classes.button} onClick={onPrevPage}>Wstecz</button>
                             <button type="submit" form="addChildForm" className={classes.button}>Dodaj</button>

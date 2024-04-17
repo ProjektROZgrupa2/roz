@@ -79,9 +79,13 @@ const useStyles = createUseStyles({
     },
 });
 
-const Form = () => {
-  const classes = useStyles();
-  const navigate = useNavigate();
+interface FormProps {
+  setIsAuth: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const Form: React.FC<FormProps> = ({ setIsAuth }) => {
+const classes = useStyles();
+const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -108,7 +112,8 @@ const Form = () => {
       const response = await loginUser(email, password);
 
       if (response.success) {
-          navigate('/home');
+        setIsAuth(true);
+        navigate('/home');
       } else {
           const errorMessage = response.message || 'Nieprawidłowy email lub hasło.';
           setLoginError(errorMessage);
