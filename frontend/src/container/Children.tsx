@@ -23,6 +23,11 @@ const useStyle = createUseStyles({
         height: '100%',
         width: '100%', 
     },
+    '@media (max-width: 768px)': {
+        root: {
+            paddingTop: '0'
+        }
+    },
 });
 
 const Children = () => {
