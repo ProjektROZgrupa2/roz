@@ -9,9 +9,6 @@ from rest_framework.response import Response
 from django.http import HttpResponse
 from .utils import add_children
 
-<<<<<<< HEAD
-=======
-
 def add_children_view(request):
     add_children()
     return HttpResponse("Przykładowe dane zostały dodane do bazy.")
