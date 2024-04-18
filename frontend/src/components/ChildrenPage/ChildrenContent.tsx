@@ -30,15 +30,22 @@ const useStyles = createUseStyles({
             backgroundColor: "#161A30",
         },
     },
+    sortButtons: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: '1rem',
+    },
     addButton: {
         width: "50px",
-
-        margin: "10px 0",
+        height: "50px",
+        borderRadius: "50%",
     },
     buttons: {
         display: 'flex',
-        flexDirection: 'row', 
-        justifyContent: 'space-between',
+        flexDirection: 'column', 
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     childrenGrid: {
         display: 'grid',
@@ -103,6 +110,9 @@ const useStyles = createUseStyles({
         wrapper: {
             marginTop: '200px',
         },
+        sortButtons: {
+            flexDirection: 'column',
+        }
     },
 });
 
@@ -199,7 +209,7 @@ const ChildrenContent = ({ refreshKey, onAddChild }: { refreshKey: number, onAdd
                 className={classes.searchBar}
             />
             <div className={classes.buttons}>
-                <div>
+                <div className={classes.sortButtons}>
                     <button className={classes.sortButton} onClick={handleSort}>Sortuj po wieku</button>
                     <button className={classes.sortButton} onClick={handleAlphaSort}>Sortuj alfabetycznie</button>
                     <button className={classes.sortButton} onClick={handleDateSort}>Sortuj po dacie przyjęcia</button>

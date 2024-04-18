@@ -2,6 +2,8 @@ import { createUseStyles } from 'react-jss';
 import { logoutUser } from '../../services/UserService';
 import GuardianVaultLogo from '../../assets/GuardianVaultLogo.png';
 import { Link } from 'react-router-dom';
+import { IoClose, IoMenu } from "react-icons/io5";
+import { useEffect, useState } from 'react';
 
 const useStyles = createUseStyles({
     navbar: {
@@ -17,7 +19,8 @@ const useStyles = createUseStyles({
         width: '100%',
         position: 'fixed',
         top: 0,
-        height: '100px',
+        left: 0,
+        zIndex: '1000',
     },
     logo: {
         width: 'clamp(70px, 10vw, 100px)',
@@ -25,7 +28,7 @@ const useStyles = createUseStyles({
     },
     linksContainer: {
         display: 'flex',
-        justifyContent: 'center',
+        justifyContent: 'space-evenly',
         alignItems: 'center',
         flex: '1',
     },
@@ -61,19 +64,24 @@ const useStyles = createUseStyles({
             color: '#31304D',
         },
     },
+    navIcon: {
+        fontSize: '2rem',
+        cursor: 'pointer',
+        display: 'none',
+    },
     '@media (max-width: 768px)': {
         navbar: {
             flexDirection: 'column',
-            height: 'auto',
-            padding: '1rem',
             justifyContent: 'center',
             alignItems: 'center',
+            top: '0',
+            width: '100%',
         },
         logo: {
             marginBottom: '1rem',
         },
         linksContainer: {
-            marginTop: '-1rem',
+            flexDirection: 'column',
         },
         links: {
             flexDirection: 'column',
@@ -86,29 +94,57 @@ const useStyles = createUseStyles({
         logoutBtn: {
             marginTop: '1rem',
         },
+        navIcon: {
+            display: 'block',
+        },
     },
 });
 
 const Navbar = () => {
+    const [showMenu, setShowMenu] = useState(false);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const classes = useStyles();
 
     const handleLogout = () => {
         logoutUser();
     };
 
+    const toggleMenu = () => {
+        setShowMenu(!showMenu);
+    };
+
+    const handleResize = () => {
+        setIsMobile(window.innerWidth <= 768);
+    };
+
+    useEffect(() => {
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
     return (
         <nav className={classes.navbar}>
             <img className={classes.logo} src={GuardianVaultLogo} alt="" />
-            <div className={classes.linksContainer}>
-                <ul className={classes.links}>
-                <li><Link to="/">Strona główna</Link></li>
-                    <li><Link to="/children">Dzieci</Link></li>
-                    <li><Link to="/documents">Dokumenty</Link></li>
-                    <li><Link to="/calendar">Kalendarz</Link></li> 
-                    <li><Link to="/settings">Ustawienia</Link></li> 
-                </ul>
-            </div>
-            <button onClick={handleLogout} className={classes.logoutBtn}>Wyloguj</button>
+
+            {showMenu ? <IoClose className={classes.navIcon} onClick={toggleMenu} /> 
+                : <IoMenu className={classes.navIcon} onClick={toggleMenu} />}
+
+            {(isMobile ? showMenu : true) && (
+                <div className={classes.linksContainer}>
+                    <ul className={classes.links}>
+                        <li><Link to="/">Strona główna</Link></li>
+                        <li><Link to="/children">Dzieci</Link></li>
+                        <li><Link to="/documents">Dokumenty</Link></li>
+                        <li><Link to="/calendar">Kalendarz</Link></li>
+                        <li><Link to="/settings">Ustawienia</Link></li>
+                    </ul>
+                    <button onClick={handleLogout} className={classes.logoutBtn}>
+                        Wyloguj
+                    </button>
+                </div>
+            )}
         </nav>
     );
 };

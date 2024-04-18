@@ -11,7 +11,7 @@ const useStyles = createUseStyles({
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'column',
-        gap: '1rem',  
+        gap: '1rem',
     },
     button: {
         padding: '10px',
@@ -59,6 +59,7 @@ const customModalStyles = {
     },
     overlay: {
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        zIndex: '2000',
     },
 };
 
