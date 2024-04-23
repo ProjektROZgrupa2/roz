@@ -1,8 +1,9 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include,re_path
 from rest_framework import routers
 from rest_framework_simplejwt import views as jwt_views
 from main import views as main_views
+from django.views.generic import TemplateView
 
 router = routers.DefaultRouter()
 router.register(r'mains', main_views.MainView, 'main')
@@ -23,6 +24,9 @@ urlpatterns = [
     path('api/logout/', main_views.LogoutView.as_view(), name='logout'),
     path('add_children/', main_views.add_children_view, name='add_children'),
     path('api/children/', main_views.get_children_view, name='get_children'),
-    path("api/auth/", include("main.urls")),
+    
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.jwt')),
+    path('auth/', include('djoser.social.urls')),
 ]
 

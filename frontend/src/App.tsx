@@ -9,6 +9,9 @@ import { useEffect, useState } from 'react';
 import { googleLogout } from '@react-oauth/google';
 import axios from 'axios';
 import { useGoogleLogin,UseGoogleLoginResponse } from 'react-google-login';
+import { Provider } from "react-redux";
+
+
 
 
 const App = () => {
@@ -39,6 +42,7 @@ const App = () => {
                     <Route path="/" element={isAuth ? <Home /> : <LandingPage />} />
                     <Route path="/login" element={!isAuth ? <Login /> : <Home />} />
                     <Route path="/register" element={!isAuth ? <Register /> : <Home />} />
+                   
                     <Route path="/home" element={isAuth ? <Home /> : <LandingPage />} />
                     <Route path="/children" element={isAuth ? <Children /> : <LandingPage />} />
                 </Routes>

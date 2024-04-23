@@ -84,12 +84,7 @@ const useStyles = createUseStyles({
 const Form = () => {
   const classes = useStyles();
   const navigate = useNavigate();
-  const responseMessage = (response) => {
-    console.log(response);
-};
-  const errorMessage = (error) => {
-    console.log(error);
-};
+
 
   
 
@@ -175,9 +170,8 @@ const Form = () => {
                 {isLoading ? 'Ładowanie...' : 'Zaloguj się'}
               </button>
               
-              <a href="http://localhost:8000/auth/google" className={classes.googleLogin}>
+              <a href="http://localhost:8000/google" className={classes.googleLogin}>
                   <FcGoogle size={25} /> Zaloguj za pomocą Google 
-                  <GoogleLogin onSuccess={responseMessage} onError={errorMessage} /> 
               </a>
           </form>
       </div>
