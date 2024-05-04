@@ -116,8 +116,17 @@ const AddChildrenForm = ( { isOpen, onClose, onChildAdded }: { isOpen: boolean, 
     const [message, setMessage] = useState('');
     const [isSuccess, setIsSuccess] = useState(false);
 
-    const onSubmit = (data : object) => {
-        axios.post('http://localhost:8000/api/addChild/', data)
+    const onSubmit = (data : any) => {
+        const formData = new FormData();
+        for (const key in data) {
+            formData.append(key, data[key]);
+        }
+
+        axios.post('http://localhost:8000/api/addChild/', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
           .then(response => {
             handleClose();
             onChildAdded();
@@ -127,7 +136,7 @@ const AddChildrenForm = ( { isOpen, onClose, onChildAdded }: { isOpen: boolean, 
           })
           .catch(error => {
             handleClose();
-            setMessage('Nie udało się dodać dziecka');
+            setMessage('Nie udało się dodać dziecka:');
             setIsSuccess(false);
             setMessageModalOpen(true);
           });
