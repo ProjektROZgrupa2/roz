@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createUseStyles } from "react-jss";
 import img from "../../assets/changepwd.png";
+import { Media } from "reactstrap";
 
 const useStyle = createUseStyles({
   image: { 
@@ -10,6 +11,9 @@ const useStyle = createUseStyles({
   },
   wrapper: {
     margin: '20px',
+    '@media (max-width: 1024px)': {
+        display: 'none',
+        }
   }
 });
 

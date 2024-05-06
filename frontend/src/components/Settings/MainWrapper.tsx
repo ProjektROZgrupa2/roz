@@ -18,11 +18,19 @@ const useStyle = createUseStyles({
     justifyContent: 'center',
     alignItems: 'center',
     height: 'auto',
-    width: '60%', 
+    width: '65%', 
     backgroundColor: '#B6BBC4',
     borderRadius: '20px', 
     border: '1px solid #ccc', 
     boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.1)', 
+    '@media (max-width: 1024px)': {
+        width: '100%',
+        justifyContent: 'center',
+        backgroundColor: '#F0ECE5',
+        borderRadius: '0px',
+        border: 'none',
+        boxShadow: 'none'
+    },
   },
   passwordText: { 
     fontSize: '1.5rem',
@@ -30,6 +38,11 @@ const useStyle = createUseStyles({
     color: '#F0ECE5',
     marginTop: '1rem',
     textShadow: '2px 2px 2px rgba(0, 0, 0, 0.3)',
+    '@media (max-width: 1024px)': {
+        color: '#31304D',
+        textShadow: 'none',
+        fontSize: '2rem',
+    },
   },
   section: {
     display: 'flex',
@@ -37,12 +50,20 @@ const useStyle = createUseStyles({
     alignItems: 'center',
     gap: '3rem',
     width: '100%',
-    padding: '1rem',
+    padding: '2rem',
+    '@media (max-width: 600px)': {
+        justifyContent: 'center',
+        flexDirection: 'column',
+    },
   },
   halfWidth: { 
     width: '50%',
-  },
-});
+    '@media (max-width: 600px)': {
+        width: '100%',
+    },
+ },
+}
+);
 
 
 const MainWrapper = () => {
