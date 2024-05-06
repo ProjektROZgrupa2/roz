@@ -11,6 +11,9 @@ COPY package.json ./
 COPY package-lock.json ./
 RUN npm install
 
+# Install react-scripts manually
+RUN npm install react-scripts@latest -g
+
 # add app
 COPY . ./
 
