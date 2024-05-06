@@ -67,3 +67,7 @@ class ChildrenSerializer(serializers.ModelSerializer):
         children = Children.objects.create(**vaidated_data)
         print("children z create: ", children)
         return children
+    
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)

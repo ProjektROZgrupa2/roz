@@ -24,5 +24,6 @@ urlpatterns = [
       path('add_children/', main_views.add_children_view, name='add_children'),
       # path('api/children/', main_views.get_children_view, name='get_children'),
       path('api/addChild/', main_views.ChildrenView.as_view(), name='addChild'),
+      path('api/change_password/', main_views.ChangePasswordView.as_view(), name='change_password'),
 ]
 

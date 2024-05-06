@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status, views
 from .models import Main, Children
-from .serializers import MainSerializer, LoginSerializer, UserSerializer, ChildrenSerializer
+from .serializers import ChangePasswordSerializer, MainSerializer, LoginSerializer, UserSerializer, ChildrenSerializer
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
@@ -89,6 +89,21 @@ class RegistrationView(views.APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ChangePasswordView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            user = request.user 
+            old_password = serializer.data.get("old_password")
+            if not user.check_password(old_password):
+                return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+            user.set_password(serializer.data.get("new_password"))
+            user.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

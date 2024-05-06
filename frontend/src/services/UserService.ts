@@ -73,3 +73,28 @@ export const logoutUser = async () => {
         console.log('logout not working', e);
     }
 }
+
+export const changePassword = async (oldPassword: string, newPassword: string) => {
+    try {
+        const token = localStorage.getItem('access_token');
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+        const response = await axios.post('http://localhost:8000/api/change_password/', { old_password: oldPassword, new_password: newPassword }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error('Error:', error);
+        if (axios.isAxiosError(error)) {
+            if (!error.response) {
+                return { success: false, message: 'Network Error' };
+            }
+            return { success: false, message: error.response.data.detail || 'Error while changing password' };
+        }
+        return { success: false, message: 'Error while changing password' };
+    }
+};
