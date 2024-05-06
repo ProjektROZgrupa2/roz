@@ -77,12 +77,16 @@ export const logoutUser = async () => {
 export const changePassword = async (oldPassword: string, newPassword: string) => {
     try {
         const token = localStorage.getItem('access_token');
+        if (!token) {
+            throw new Error('No access token found');
+        }
+
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
         const response = await axios.post('http://localhost:8000/api/change_password/', { old_password: oldPassword, new_password: newPassword }, {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Token ${token}`
             }
         });
 

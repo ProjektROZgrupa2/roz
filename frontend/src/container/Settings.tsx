@@ -1,6 +1,6 @@
 import { createUseStyles } from "react-jss";
 import Navbar from "../components/DefaultPageTemplate/Navbar";
-import MainContent from "../components/ChildrenPage/MainContent";
+import MainWrapper from "../components/Settings/MainWrapper";
 
 const useStyle = createUseStyles({
     root: {
@@ -8,11 +8,10 @@ const useStyle = createUseStyles({
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'column',
-        minHeight: '100vh',
         gap: '1rem',
         width: '100%',
+        height: '100vh',
         backgroundColor: '#F0ECE5',
-        paddingTop: '100px',
     },
     wrapper: {
         display: 'flex',
@@ -23,24 +22,19 @@ const useStyle = createUseStyles({
         height: '100%',
         width: '100%', 
     },
-    '@media (max-width: 768px)': {
-        root: {
-            paddingTop: '0'
-        }
-    },
 });
 
-const Children = () => {
+const Settings = () => {
     const classes = useStyle();
     return (
         <div className={classes.root}>
             <div className={classes.wrapper}>
                 <Navbar/>
-                <MainContent/>
+                <MainWrapper/>
             </div>
         </div>
         
       );
 };
 
-export default Children;
+export default Settings;
