@@ -1,6 +1,7 @@
 from django.urls import path
 from main import views
-
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('', views.HomeView.as_view(), name='home'),
@@ -12,4 +13,4 @@ urlpatterns = [
     path('add_children/', views.add_children_view, name='add_children'),
     # path('api/children/', views.get_children_view, name='get_children'),
     path('api/addChild/', views.ChildrenView.as_view(), name='addChild'),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

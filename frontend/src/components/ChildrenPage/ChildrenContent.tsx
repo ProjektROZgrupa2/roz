@@ -121,7 +121,7 @@ interface Child {
     name: string;
     surname: string;
     dateOfBirth: string; 
-    image: string;
+    image: string; 
     dateOfAdmission: string;
 }
 
