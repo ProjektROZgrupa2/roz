@@ -30,7 +30,7 @@ const useStyles = createUseStyles({
             backgroundColor: "#161A30",
         },
     },
-    sortButtons: {
+    menuButtons: {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -40,12 +40,6 @@ const useStyles = createUseStyles({
         width: "50px",
         height: "50px",
         borderRadius: "50%",
-    },
-    buttons: {
-        display: 'flex',
-        flexDirection: 'column', 
-        justifyContent: 'center',
-        alignItems: 'center',
     },
     childrenGrid: {
         display: 'grid',
@@ -71,6 +65,12 @@ const useStyles = createUseStyles({
             boxShadow: '0 0 20px 0 rgba(0, 0, 0, 0.2)', 
         },
     },
+    childImg: {
+        width: '10vw',
+        height: '10vw',
+        borderRadius: '50%',
+        objectFit: 'cover',
+    },
     searchBar: {
         width: '80%',
         padding: '10px',
@@ -88,7 +88,6 @@ const useStyles = createUseStyles({
     sortButton: {
         width: "200px",
         padding: "10px",
-        margin: "10px 0",
         borderRadius: "5px",
         border: "1px solid #ccc",
         backgroundColor: "#31304D",
@@ -110,9 +109,13 @@ const useStyles = createUseStyles({
         wrapper: {
             marginTop: '200px',
         },
-        sortButtons: {
+        menuButtons: {
             flexDirection: 'column',
-        }
+        },
+        childImg: {
+            width: '25vw',
+            height: '25vw',
+        },
     },
 });
 
@@ -124,6 +127,10 @@ interface Child {
     image: string; 
     dateOfAdmission: string;
 }
+
+const serverUrl = 'http://localhost:8000';
+
+const getImageUrl = (imageName: string) => `${serverUrl}/${imageName}`;
 
 function calculateAge(dateOfBirth: string): number {
     const dob = new Date(dateOfBirth);
@@ -201,30 +208,26 @@ const ChildrenContent = ({ refreshKey, onAddChild }: { refreshKey: number, onAdd
     return (
         <div className={classes.wrapper}>
             <h1>Lista dzieci</h1>
-            <input
-                type="text"
-                placeholder="Szukaj po imieniu lub nazwisku"
-                value={searchTerm}
-                onChange={event => setSearchTerm(event.target.value)}
-                className={classes.searchBar}
-            />
-            <div className={classes.buttons}>
-                <div className={classes.sortButtons}>
-                    <button className={classes.sortButton} onClick={handleSort}>Sortuj po wieku</button>
-                    <button className={classes.sortButton} onClick={handleAlphaSort}>Sortuj alfabetycznie</button>
-                    <button className={classes.sortButton} onClick={handleDateSort}>Sortuj po dacie przyjęcia</button>
-                </div>
-                <div>
-                    <button className={`${classes.button} ${classes.addButton}`} onClick={onAddChild}>+</button>
-                </div>
+            <div className={classes.menuButtons}>
+                <input
+                    type="text"
+                    placeholder="Szukaj po imieniu lub nazwisku"
+                    value={searchTerm}
+                    onChange={event => setSearchTerm(event.target.value)}
+                    className={classes.searchBar}
+                />
+                <button className={classes.sortButton} onClick={handleSort}>Sortuj po wieku</button>
+                <button className={classes.sortButton} onClick={handleAlphaSort}>Sortuj alfabetycznie</button>
+                <button className={classes.sortButton} onClick={handleDateSort}>Sortuj po dacie przyjęcia</button>
+                <button className={`${classes.button} ${classes.addButton}`} onClick={onAddChild}>+</button>                
             </div>
             <div className={classes.childrenGrid}>
                 {filteredChildren.map(child => (
                     <div key={child.id} className={classes.childCard}>
-                        <img src={child.image || defaultImage} alt={`${child.name} ${child.surname}`} />
+                        <img className={classes.childImg} src={child.image ? getImageUrl(child.image) : defaultImage} alt={`${child.name} ${child.surname}`} />
                         <h2>{child.name} {child.surname}</h2>
                         <p>Wiek: {calculateAge(child.dateOfBirth)}</p>
-                        <div className={classes.buttons}>
+                        <div className={classes.menuButtons}>
                             <button className={classes.button}>Szczegóły</button>
                         </div>
                     </div>
