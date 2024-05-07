@@ -22,6 +22,7 @@ class Children(models.Model):
     legalGuardian = models.CharField(max_length=60, blank=False, null=False)
     siblings = models.IntegerField(default=0, blank=False, null=False)
     comments = models.TextField(blank=True, null=True)
+    image = models.ImageField(upload_to='children_images/', blank=True, null=True)
 
 
     def __str__(self):

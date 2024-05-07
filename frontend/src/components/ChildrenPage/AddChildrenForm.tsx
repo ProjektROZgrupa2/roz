@@ -122,6 +122,10 @@ const AddChildrenForm = ( { isOpen, onClose, onChildAdded }: { isOpen: boolean, 
             formData.append(key, data[key]);
         }
 
+        if (data.image[0]) {
+            formData.append('image', data.image[0]);
+        }
+
         axios.post('http://localhost:8000/api/addChild/', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
@@ -250,13 +254,13 @@ const AddChildrenForm = ( { isOpen, onClose, onChildAdded }: { isOpen: boolean, 
                                 errorMessage="To pole jest wymagane"
                                 type="textarea"
                             />
-                            {/* <InputField
+                            <InputField
                                 label="Zdjęcie"
                                 register={register('image', { required: false })}
                                 error={!!errors.legalGuardian}
                                 errorMessage="To pole jest wymagane"
                                 type="file"
-                            // /> */}
+                            />
                             <div className={classes.buttonsContainer}>
                                 <button type="button" className={`${classes.button} ${classes.cancelBtn}`} onClick={handleClose}>Anuluj</button>
                                 <button type="submit" form="addChildForm" className={classes.button}>Dodaj</button>

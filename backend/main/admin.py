@@ -9,7 +9,7 @@ class MainAdmin(admin.ModelAdmin):
     list_display = ('title', 'description', 'completed')
 
 class ChildrenAdmin(admin.ModelAdmin):
-    list_display = ('name', 'surname', 'dateOfBirth', 'placeOfBirth', 'dateOfAdmission', 'referralNumber', 'mother', 'father', 'legalGuardian', 'siblings', 'comments')
+    list_display = ('name', 'surname', 'dateOfBirth', 'placeOfBirth', 'dateOfAdmission', 'referralNumber', 'mother', 'father', 'legalGuardian', 'siblings', 'comments', 'image')
 
 # Register your models here.
 

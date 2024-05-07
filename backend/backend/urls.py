@@ -3,6 +3,8 @@ from django.urls import path, include
 from rest_framework import routers
 from rest_framework_simplejwt import views as jwt_views
 from main import views as main_views
+from django.conf.urls.static import static
+from django.conf import settings
 
 router = routers.DefaultRouter()
 router.register(r'mains', main_views.MainView, 'main')
@@ -25,5 +27,6 @@ urlpatterns = [
       # path('api/children/', main_views.get_children_view, name='get_children'),
       path('api/addChild/', main_views.ChildrenView.as_view(), name='addChild'),
       path('api/change_password/', main_views.ChangePasswordView.as_view(), name='change_password'),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 
