@@ -116,35 +116,35 @@ const AddChildrenForm = ( { isOpen, onClose, onChildAdded }: { isOpen: boolean, 
     const [message, setMessage] = useState('');
     const [isSuccess, setIsSuccess] = useState(false);
 
-    const onSubmit = (data : any) => {
-        const formData = new FormData();
-        for (const key in data) {
-            formData.append(key, data[key]);
-        }
-
-        if (data.image[0]) {
-            formData.append('image', data.image[0]);
-        }
-
-        axios.post('http://localhost:8000/api/addChild/', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
+    const onSubmit = async (data : any) => {
+        try {
+            const formData = new FormData();
+            for (const key in data) {
+                formData.append(key, data[key]);
             }
-        })
-          .then(response => {
+
+            if (data.image[0]) {
+                formData.append('image', data.image[0]);
+            }
+
+            const response = await axios.post('http://localhost:8000/api/addChild/', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
             handleClose();
             onChildAdded();
             setMessage('Dziecko zostało dodane');
             setIsSuccess(true);
             setMessageModalOpen(true);
-          })
-          .catch(error => {
+        } catch (error) {
             handleClose();
-            setMessage('Nie udało się dodać dziecka:');
+            setMessage('Nie udało się dodać dziecka');
             setIsSuccess(false);
             setMessageModalOpen(true);
-          });
-      };
+          }
+    };
 
       const handleClose = () => {
         reset();
@@ -169,42 +169,60 @@ const AddChildrenForm = ( { isOpen, onClose, onChildAdded }: { isOpen: boolean, 
                         <>
                             <InputField
                                 label="Imię"
-                                register={register('name', { required: true })}
+                                register={register('name', { 
+                                    required: true,
+                                    maxLength: { value: 50, message: 'Maksymalna długość to 50 znaków' },
+                                })}
                                 error={!!errors.name}
-                                errorMessage="To pole jest wymagane"
+                                errorMessage='To pole jest wymagane'
                                 type="text"
                             />
                             <InputField
                                 label="Nazwisko"
-                                register={register('surname', { required: true })}
+                                register={register('surname', { 
+                                    required: true,
+                                    maxLength: 50, 
+                                })}
                                 error={!!errors.surname}
                                 errorMessage="To pole jest wymagane"
                                 type="text"
                             />
                             <InputField
                                 label="Data urodzenia"
-                                register={register('dateOfBirth', { required: true })}
+                                register={register('dateOfBirth', { 
+                                    required: true,
+                                    pattern: /^\d{2}-\d{2}-\d{4}$/,
+                                })}
                                 error={!!errors.dateOfBirth}
-                                errorMessage="To pole jest wymagane"
+                                errorMessage="To pole jest wymagane (format: dd-mm-yyyy)"
                                 type="date"
                             />
                             <InputField
                                 label="Miejsce urodzenia"
-                                register={register('placeOfBirth', { required: true })}
+                                register={register('placeOfBirth', { 
+                                    required: true,
+                                    maxLength: 50,
+                                })}
                                 error={!!errors.placeOfBirth}
                                 errorMessage="To pole jest wymagane"
                                 type="text"
                             />
                             <InputField
                                 label="Data przyjęcia"
-                                register={register('dateOfAdmission', { required: true })}
+                                register={register('dateOfBirth', { 
+                                    required: true,
+                                    pattern: /^\d{2}-\d{2}-\d{4}$/,
+                                })}
                                 error={!!errors.dateOfAdmission}
-                                errorMessage="To pole jest wymagane"
+                                errorMessage="To pole jest wymagane (format: dd-mm-yyyy)"
                                 type="date"
                             />
                             <InputField
                                 label="Numer skierowania"
-                                register={register('referralNumber', { required: true })}
+                                register={register('referralNumber', { 
+                                    required: true,
+                                    maxLength: 30, 
+                                })}
                                 error={!!errors.referralNumber}
                                 errorMessage="To pole jest wymagane"
                                 type="text"
@@ -221,44 +239,75 @@ const AddChildrenForm = ( { isOpen, onClose, onChildAdded }: { isOpen: boolean, 
                         <>
                             <InputField
                                 label="Matka"
-                                register={register('mother', { required: true })}
+                                register={register('mother', { 
+                                    required: true,
+                                    maxLength: 50,
+                                })}
                                 error={!!errors.mother}
                                 errorMessage="To pole jest wymagane"
                                 type="text"
                             />
                             <InputField
                                 label="Ojciec"
-                                register={register('father', { required: true })}
+                                register={register('father', { 
+                                    required: true,
+                                    maxLength: 50,
+                                })}
                                 error={!!errors.father}
                                 errorMessage="To pole jest wymagane"
                                 type="text"
                             />
                             <InputField
                                 label="Opiekun prawny"
-                                register={register('legalGuardian', { required: true })}
+                                register={register('legalGuardian', { 
+                                    required: true,
+                                    maxLength: 50, 
+                                })}
                                 error={!!errors.legalGuardian}
                                 errorMessage="To pole jest wymagane"
                                 type="text"
                             />
                             <InputField
                                 label="Rodzeństwo"
-                                register={register('siblings', { required: true })}
+                                register={register('siblings', {
+                                     required: true,
+                                     pattern: /^\d+$/,
+                                     max: 20,
+                                })}
                                 error={!!errors.siblings}
                                 errorMessage="To pole jest wymagane"
                                 type="number"
                             />
                             <InputField
                                 label="Uwagi"
-                                register={register('comments', { required: true })}
-                                error={!!errors.legalGuardian}
+                                register={register('comments', { 
+                                    required: true,
+                                    maxLength: 200,
+                                })}
+                                error={!!errors.comments}
                                 errorMessage="To pole jest wymagane"
                                 type="textarea"
                             />
                             <InputField
                                 label="Zdjęcie"
-                                register={register('image', { required: false })}
-                                error={!!errors.legalGuardian}
-                                errorMessage="To pole jest wymagane"
+                                register={register('image', { 
+                                    required: false,
+                                    validate: (value) => {
+                                        if (!value[0]) return true;
+
+                                        const acceptedFormats = ['image/jpeg', 'image/png'];
+                                        const file = value[0];
+
+                                        if (!acceptedFormats.includes(file.type)) {
+                                            return false;
+                                        }
+
+                                        return true;
+                                      }
+                                    
+                                })}
+                                error={!!errors.image}
+                                errorMessage="Niepoprawny format pliku (dozwolone: jpg, png)"
                                 type="file"
                             />
                             <div className={classes.buttonsContainer}>
