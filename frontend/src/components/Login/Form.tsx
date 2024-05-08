@@ -169,7 +169,7 @@ const navigate = useNavigate();
               <button type="submit" className={classes.button}>
                 {isLoading ? 'Ładowanie...' : 'Zaloguj się'}
               </button>
-              <a href="http://localhost:8000/auth/google" className={classes.googleLogin}>
+              <a href="http://localhost:8000/accounts/google/login" className={classes.googleLogin}>
                   <FcGoogle size={25} /> Zaloguj za pomocą Google
               </a>
           </form>

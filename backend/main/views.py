@@ -8,7 +8,12 @@ from rest_framework import status
 from rest_framework.response import Response
 from django.http import HttpResponse
 from .utils import add_children
+from django.views.generic import TemplateView
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.shortcuts import redirect
+
+def rd(request):
+    return redirect('http://127.0.0.1:3000/home')
 
 def add_children_view(request):
     add_children()
