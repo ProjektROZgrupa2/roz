@@ -12,6 +12,7 @@ router.register(r'mains', main_views.MainView, 'main')
 urlpatterns = [
 
       path('api/login/', main_views.LoginView.as_view(), name='login'),
+      path('api/loginGoogle/', main_views.GoogleLoginView.as_view(), name='loginGoogle'),
       path('api/register/', main_views.RegistrationView.as_view(), name='register'),
       path('', include(router.urls)),
       path('admin/', admin.site.urls),

@@ -6,6 +6,7 @@ from django.conf import settings
 urlpatterns = [
     path('', views.HomeView.as_view(), name='home'),
     path('api/login/', views.LoginView.as_view(), name='login'),
+    path('api/loginGoogle/', views.GoogleLoginView.as_view(), name='loginGoogle'),
     path('api/logout/', views.LogoutView.as_view(), name='logout'),
     path('api/register/', views.RegistrationView.as_view(), name='register'),
     path('api/main/', views.MainView.as_view({'get': 'list', 'post': 'create'}), name='main-list'),

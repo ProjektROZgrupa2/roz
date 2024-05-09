@@ -12,6 +12,11 @@ from django.views.generic import TemplateView
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.shortcuts import redirect
 
+from django.contrib.auth import authenticate, login
+from django.conf import settings
+import requests
+
+
 def rd(request):
     return redirect('http://127.0.0.1:3000/home')
 
@@ -65,6 +70,10 @@ class LoginView(views.APIView):
         return response
 
 
+
+
+
+
 class LogoutView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -100,5 +109,34 @@ class ChangePasswordView(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-
+class GoogleLoginView(views.APIView):
+    def post(self, request, *args, **kwargs):
+      
+        token = request.data.get('token', None)
+        
+        if not token:
+            return Response({"error": "Token is required."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+        response = requests.get('https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=' + token)
+        if response.status_code != 200:
+            return Response({"error": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
+        
+       
+        data = response.json()
+        google_user_id = data.get('sub', None)
+        if not google_user_id:
+            return Response({"error": "Unable to fetch user data from Google."}, status=status.HTTP_400_BAD_REQUEST)
+            
+       
+        token, created = Token.objects.get_or_create(user=user)
+        
+        redirect_url = 'http://localhost:3000/home'
+        
+       
+        response = Response({
+            "user": str(user),
+            "token": token.key,
+        }, status=status.HTTP_200_OK)
+        response['Location'] = redirect_url
+        return response
