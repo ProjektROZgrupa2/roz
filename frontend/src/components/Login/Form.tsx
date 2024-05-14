@@ -4,6 +4,7 @@ import { FcGoogle } from 'react-icons/fc';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../../services/UserService';
+import { useGoogleLogin } from '@react-oauth/google';
 
 
 const useStyles = createUseStyles({
@@ -139,6 +140,24 @@ const navigate = useNavigate();
         setEmailFormatError('');
       }
   };
+  
+  const login = useGoogleLogin({
+    onSuccess: async (response) => {
+      try {
+        const userInfo = await axios
+        .get('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${response.access_token}` },
+        })
+        
+
+        console.log(userInfo)
+        setIsAuth(true)
+      } catch (error) {
+        console.log(error)
+        setIsAuth(false)
+      }
+    }
+  });
 
   return (
       <div className={classes.wrapper}>
@@ -169,7 +188,7 @@ const navigate = useNavigate();
               <button type="submit" className={classes.button}>
                 {isLoading ? 'Ładowanie...' : 'Zaloguj się'}
               </button>
-              <a href="http://localhost:8000/auth/google" className={classes.googleLogin}>
+              <a className={classes.googleLogin} onClick={() => login()}>
                   <FcGoogle size={25} /> Zaloguj za pomocą Google
               </a>
           </form>

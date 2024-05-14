@@ -1,4 +1,4 @@
-import react from 'react';
+import React from 'react';
 import { createUseStyles } from 'react-jss';
 import GuardianVaultLogo from '../../assets/GuardianVaultLogo.png';
 

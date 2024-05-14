@@ -1,3 +1,4 @@
+import React from 'react';
 import { createUseStyles } from 'react-jss';
 import RightWrapper from '../components/Register/RightWrapper';
 import LeftWrapper from '../components/Register/LeftWrapper';
