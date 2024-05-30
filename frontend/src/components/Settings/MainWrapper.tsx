@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState } from "react";
 import { createUseStyles } from "react-jss";
 import LeftWrapper from "./LeftWrapper";

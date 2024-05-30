@@ -1,4 +1,5 @@
 import { createUseStyles } from 'react-jss';
+import React from 'react';
 
 const useStyles = createUseStyles({
   leftAppInfo: {

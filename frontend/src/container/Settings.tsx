@@ -1,4 +1,5 @@
 import { createUseStyles } from "react-jss";
+import React from 'react';
 import Navbar from "../components/DefaultPageTemplate/Navbar";
 import MainWrapper from "../components/Settings/MainWrapper";
 

@@ -1,9 +1,11 @@
+import React from 'react';
 import { createUseStyles } from 'react-jss';
 import { logoutUser } from '../../services/UserService';
 import GuardianVaultLogo from '../../assets/GuardianVaultLogo.png';
 import { Link } from 'react-router-dom';
 import { IoClose, IoMenu } from "react-icons/io5";
 import { useEffect, useState } from 'react';
+import { googleLogout } from '@react-oauth/google';
 
 const useStyles = createUseStyles({
     navbar: {
@@ -106,7 +108,8 @@ const Navbar = () => {
     const classes = useStyles();
 
     const handleLogout = () => {
-        logoutUser();
+        googleLogout();
+        logoutUser(true);
     };
 
     const toggleMenu = () => {

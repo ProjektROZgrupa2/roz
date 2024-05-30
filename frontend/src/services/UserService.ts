@@ -52,22 +52,24 @@ export const loginUser = async (email: string, password: string) => {
     }
 };
 
-export const logoutUser = async () => {
+export const logoutUser = async (isSignedInWithGoogle : boolean) => {
     try {
-        const token = localStorage.getItem('access_token');
-        console.log('Sending request with headers:', {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        });
-        await axios.post('http://localhost:8000/api/logout/', {}, {
-            headers: { 
-                'Content-Type': 'application/json' ,
-                'Authorization': `Token ${token}`
-            },
-            
-        });
+        if (!isSignedInWithGoogle){
+            const token = localStorage.getItem('access_token');
+            console.log('Sending request with headers:', {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            });
+            await axios.post('http://localhost:8000/api/logout/', {}, {
+                headers: { 
+                    'Content-Type': 'application/json' ,
+                    'Authorization': `Token ${token}`
+                },
+                
+            });
+            delete axios.defaults.headers.common['Authorization'];
+        }
         localStorage.clear();
-        delete axios.defaults.headers.common['Authorization'];
         window.location.href = '/login';
     } catch (e) {
         console.log('logout not working', e);

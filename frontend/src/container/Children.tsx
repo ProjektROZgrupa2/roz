@@ -1,3 +1,4 @@
+import React from 'react';
 import { createUseStyles } from "react-jss";
 import Navbar from "../components/DefaultPageTemplate/Navbar";
 import MainContent from "../components/ChildrenPage/MainContent";

@@ -209,7 +209,7 @@ const AddChildrenForm = ( { isOpen, onClose, onChildAdded }: { isOpen: boolean, 
                             />
                             <InputField
                                 label="Data przyjęcia"
-                                register={register('dateOfBirth', { 
+                                register={register('dateOfAdmission', { 
                                     required: true,
                                     pattern: /^\d{2}-\d{2}-\d{4}$/,
                                 })}

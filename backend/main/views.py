@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from django.http import HttpResponse
 from .utils import add_children
 from rest_framework.parsers import MultiPartParser, FormParser
+from .google_drive import upload_file
 
 def add_children_view(request):
     add_children()
@@ -25,8 +26,10 @@ class ChildrenView(APIView):
 
     def post(self, request, format=None):
         serializer = ChildrenSerializer(data=request.data)
+       # upload_file(request.data.dict())
         if serializer.is_valid():
             serializer.save()
+            upload_file(request.data.dict())
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
