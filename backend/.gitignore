@@ -1,2 +1,5 @@
 media/
 __pycache__/
+entrypoint.sh
+../.env
+.env
