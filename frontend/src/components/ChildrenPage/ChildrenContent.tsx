@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { createUseStyles } from "react-jss";
 import defaultImage from '../../assets/defaultImage.svg';
+import Modal from 'react-modal';
 
 const useStyles = createUseStyles({
     wrapper: {
@@ -14,7 +15,7 @@ const useStyles = createUseStyles({
         width: '100%',
     },
     button: {
-        width: "100px",
+        width: "150px",
         padding: "10px",
         margin: "5px 0",
         borderRadius: "5px",
@@ -37,9 +38,14 @@ const useStyles = createUseStyles({
         gap: '1rem',
     },
     addButton: {
-        width: "50px",
-        height: "50px",
-        borderRadius: "50%",
+        width: "150px",
+        margin: "15px 0",
+        backgroundColor: "#B6BBC4",
+        color: "#31304D",
+        "&:hover": {
+            backgroundColor: "#31304D",
+            color: "#B6BBC4",
+        },
     },
     buttons: {
         display: 'flex',
@@ -114,13 +120,88 @@ const useStyles = createUseStyles({
             flexDirection: 'column',
         }
     },
+    modalContent: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 'auto',
+        maxHeight: '80vh',
+        width: '80%',
+        maxWidth: '600px',
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        backgroundColor: '#31304D',
+        color: 'white',
+        borderRadius: '20px',
+        padding: '2rem',
+        boxShadow: '0 5px 15px rgba(0, 0, 0, 0.3)',
+        overflowY: 'auto',
+    },
+    modalHeader: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        borderBottom: '1px solid #ccc',
+        paddingBottom: '1.2rem',
+        marginBottom: '1rem',
+    },
+    modalTitle: {
+        margin: 0,
+        fontSize: '1.5rem',
+    },
+    modalCloseButton: {
+        background: 'none',
+        border: 'none',
+        color: 'white',
+        fontSize: '1.5rem',
+        cursor: 'pointer',
+        transition: 'color 0.3s ease',
+        '&:hover': {
+            color: '#ff4c4c',
+        },
+    },
+    modalForm: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        gap: '1rem',
+        margin: '2rem 0',
+        width: '100%',
+    },
+    modalButton: {
+        padding: '10px 20px',
+        marginTop: '1rem',
+        backgroundColor: '#B6BBC4',
+        color: '#31304D',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'pointer',
+        transition: 'background-color 0.3s ease, color 0.3s ease',
+        '&:hover': {
+            backgroundColor: '#31304D',
+            color: '#B6BBC4',
+        },
+    },
+    overlay: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        zIndex: 1000,
+    },
 });
 
 interface Child {
     id: number;
     name: string;
     surname: string;
-    dateOfBirth: string; 
+    dateOfBirth: string;
     image: string;
     dateOfAdmission: string;
 }
@@ -131,7 +212,8 @@ function calculateAge(dateOfBirth: string): number {
     today.setHours(0, 0, 0, 0);
 
     if (dob > today) {
-        return 0;}
+        return 0;
+    }
 
     let age = today.getFullYear() - dob.getFullYear();
     const m = today.getMonth() - dob.getMonth();
@@ -145,20 +227,31 @@ function calculateAge(dateOfBirth: string): number {
 
 const ChildrenContent = ({ refreshKey, onAddChild }: { refreshKey: number, onAddChild: () => void }) => {
     const classes = useStyles();
-    const [searchTerm, setSearchTerm] = useState(''); 
+    const [searchTerm, setSearchTerm] = useState('');
     const [alphaSortOrder, setAlphaSortOrder] = useState(true);
-    const [sortOrder, setSortOrder] = useState(true); 
-
+    const [sortOrder, setSortOrder] = useState(true);
+    const [modalIsOpen, setModalIsOpen] = useState(false);
     const [children, setChildren] = useState<Child[]>([]);
+    const [selectedChild, setSelectedChild] = useState<Child | null>(null); // Nowy stan
+
+    const openModal = (child: Child) => {
+        setSelectedChild(child);
+        setModalIsOpen(true);
+    };
+
+    const closeModal = () => {
+        setModalIsOpen(false);
+        setSelectedChild(null);
+    };
 
     useEffect(() => {
         axios.get('http://localhost:8000/api/addChild/')
-        .then(response => {
-            setChildren(response.data);
-        })
-        .catch(error => {
-            console.error('Błąd pobierania listy dzieci:', error);
-        });
+            .then(response => {
+                setChildren(response.data);
+            })
+            .catch(error => {
+                console.error('Błąd pobierania listy dzieci:', error);
+            });
     }, [refreshKey]);
 
     const handleSort = () => {
@@ -198,6 +291,25 @@ const ChildrenContent = ({ refreshKey, onAddChild }: { refreshKey: number, onAdd
         setChildren(sortedChildren);
     };
 
+    const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        if (selectedChild) {
+            formData.append('childId', selectedChild.id.toString());
+        }
+
+        console.log('FormData przed wysłaniem:', Array.from(formData.entries()));
+
+        axios.post('http://localhost:8000/api/uploadDocument/', formData)
+            .then(response => {
+                console.log('Document uploaded successfully:', response.data);
+                closeModal();
+            })
+            .catch(error => {
+                console.error('Error uploading document:', error);
+            });
+    };
+
     return (
         <div className={classes.wrapper}>
             <h1>Lista dzieci</h1>
@@ -215,7 +327,7 @@ const ChildrenContent = ({ refreshKey, onAddChild }: { refreshKey: number, onAdd
                     <button className={classes.sortButton} onClick={handleDateSort}>Sortuj po dacie przyjęcia</button>
                 </div>
                 <div>
-                    <button className={`${classes.button} ${classes.addButton}`} onClick={onAddChild}>+</button>
+                    <button className={`${classes.button} ${classes.addButton}`} onClick={onAddChild}>Dodaj dziecko</button>
                 </div>
             </div>
             <div className={classes.childrenGrid}>
@@ -225,11 +337,27 @@ const ChildrenContent = ({ refreshKey, onAddChild }: { refreshKey: number, onAdd
                         <h2>{child.name} {child.surname}</h2>
                         <p>Wiek: {calculateAge(child.dateOfBirth)}</p>
                         <div className={classes.buttons}>
-                            <button className={classes.button}>Szczegóły</button>
+                            <button className={classes.button} onClick={() => openModal(child)}>Dodaj dokument</button>
                         </div>
                     </div>
                 ))}
             </div>
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={closeModal}
+                contentLabel="Add Document Modal"
+                className={classes.modalContent}
+                overlayClassName={classes.overlay}
+            >
+                <div className={classes.modalHeader}>
+                    <h2 className={classes.modalTitle}>Dodaj dokument</h2>
+                    <button onClick={closeModal} className={classes.modalCloseButton}>&times;</button>
+                </div>
+                <form className={classes.modalForm} onSubmit={handleFormSubmit}>
+                    <input type="file" name="document" required />
+                    <button type="submit" className={classes.modalButton}>Prześlij</button>
+                </form>
+            </Modal>
         </div>
     );
 };

@@ -4,6 +4,7 @@ from django.contrib import admin
 
 from django.contrib import admin
 from .models import Main, Children
+from .models import Post
 
 class MainAdmin(admin.ModelAdmin):
     list_display = ('title', 'description', 'completed')
@@ -15,3 +16,4 @@ class ChildrenAdmin(admin.ModelAdmin):
 
 admin.site.register(Main, MainAdmin)
 admin.site.register(Children, ChildrenAdmin)
+admin.site.register(Post)

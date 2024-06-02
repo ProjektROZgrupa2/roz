@@ -14,6 +14,7 @@ urlpatterns = [
       path('', include(router.urls)),
       path('admin/', admin.site.urls),
       path('api/', include(router.urls)),
+      path('api/', include('main.urls')),
       path('token/', 
             jwt_views.TokenObtainPairView.as_view(), 
             name='token_obtain_pair'),
@@ -26,4 +27,5 @@ urlpatterns = [
       path('api/addChild/', main_views.ChildrenView.as_view(), name='addChild'),
       path('api/change_password/', main_views.ChangePasswordView.as_view(), name='change_password'),
 ]
+
 

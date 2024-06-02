@@ -12,4 +12,5 @@ urlpatterns = [
     path('add_children/', views.add_children_view, name='add_children'),
     # path('api/children/', views.get_children_view, name='get_children'),
     path('api/addChild/', views.ChildrenView.as_view(), name='addChild'),
+    path('posts/', views.PostView.as_view(), name= 'posts_list'),
 ]
