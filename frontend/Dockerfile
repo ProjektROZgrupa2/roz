@@ -1,21 +1,17 @@
 FROM node:lts-slim
 
-# set work directory
-WORKDIR /app/
+WORKDIR /app
 
-# add to $PATH
 ENV PATH /app/node_modules/.bin:$PATH
 
-# install app dependencies
 COPY package.json ./
 COPY package-lock.json ./
-RUN npm install
 
-# Install react-scripts manually
-RUN npm install react-scripts@latest -g
+RUN npm install --save-dev
 
-# add app
+RUN npm install -g react-scripts@latest
+
 COPY . ./
 
-# start app
 CMD ["npm", "start"]
+
