@@ -114,8 +114,7 @@ const navigate = useNavigate();
         setIsAuth(true);
         navigate('/home');
       } else {
-          const errorMessage = response.message || 'Nieprawidłowy email lub hasło.';
-          setLoginError(errorMessage);
+        setLoginError('Niepoprawne login lub hasło. Spróbuj ponownie.');
       }
     } catch (error) {
       if ((error as Error).message === 'Brak połączenia. Spróbuj ponownie później.') {

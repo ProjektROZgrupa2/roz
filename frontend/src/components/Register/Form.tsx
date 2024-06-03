@@ -53,7 +53,7 @@ const useStyles = createUseStyles({
         border: '2px solid red',
     },
     messageBox: {
-        border: '1px solid red',
+        border: '1px solid #ccc',
         borderRadius: '5px',
         padding: '5px 10px',
         marginBottom: '15px',

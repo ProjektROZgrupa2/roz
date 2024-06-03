@@ -140,10 +140,10 @@ const AddChildrenForm = ( { isOpen, onClose, onChildAdded }: { isOpen: boolean, 
             setMessageModalOpen(true);
         } catch (error) {
             handleClose();
-            setMessage('Nie udało się dodać dziecka');
+            setMessage((error as any).response.data.message || 'Nie udało się dodać dziecka');
             setIsSuccess(false);
             setMessageModalOpen(true);
-          }
+        }
     };
 
       const handleClose = () => {
