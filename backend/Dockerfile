@@ -1,16 +1,20 @@
 FROM python:3.11-slim-bullseye
 
-# set work directory
 WORKDIR /app
 
-# set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# install dependencies
 RUN pip install --upgrade pip
+
+RUN pip install python-decouple
+
 COPY ./requirements.txt .
 
 RUN pip install -r requirements.txt
 
 COPY . .
+
+COPY entrypoint.sh /app/entrypoint.sh
+
+ENTRYPOINT ["/app/entrypoint.sh"]
