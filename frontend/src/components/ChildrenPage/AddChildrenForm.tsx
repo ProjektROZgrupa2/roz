@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createUseStyles } from "react-jss";
 import Modal from "react-modal";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import axios from 'axios';
 import InputField from './InputField';
 import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";

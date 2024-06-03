@@ -52,12 +52,18 @@ const useStyles = createUseStyles({
     inputError: {
         border: '2px solid red',
     },
-    errorBox: {
+    messageBox: {
         border: '1px solid red',
         borderRadius: '5px',
         padding: '5px 10px',
-        color: 'red',
         marginBottom: '15px',
+    },
+    messageSuccess: {
+        color: 'green',
+        backgroundColor: 'rgba(0, 255, 0, 0.1)',
+    },
+    messageError: {
+        color: 'red',
         backgroundColor: 'rgba(255, 0, 0, 0.1)',
     },
 });
@@ -68,6 +74,7 @@ const Form = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [emailError, setEmailError] = useState('');
+    const [isFormSubmittedSuccessfully, setIsFormSubmittedSuccessfully] = useState(false);
     const classes = useStyles();
 
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,16 +101,19 @@ const Form = () => {
         const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
         if (!emailRegex.test(email)) {
             setErrorMessage("Wprowadź poprawny email.");
+            setIsFormSubmittedSuccessfully(false);
             return;
         }
 
         if (password.length < 8 || !/\d/.test(password) || !/[a-zA-Z]/.test(password)) {
             setErrorMessage("Hasło musi zawierać co najmniej 8 znaków, jedną cyfrę i jedną literę.");
+            setIsFormSubmittedSuccessfully(false);
             return;
         }
 
         if (password !== confirmPassword) {
             setErrorMessage("Hasła są różne.");
+            setIsFormSubmittedSuccessfully(false);
             return;
         }
 
@@ -111,22 +121,29 @@ const Form = () => {
             const response = await registerUser(email, password);
             if (response.error) {
                 setErrorMessage(response.message);
+                setIsFormSubmittedSuccessfully(false);
                 return;
             }
         
             setErrorMessage("Konto utworzone pomyślnie.");
+            setIsFormSubmittedSuccessfully(true);
         } catch (error) {
             if ((error as Error).message.includes('ECONNREFUSED')) {
                 setErrorMessage("Błąd proxy: Nie można przekierować żądania. Brak połączenia z serwerem.");
             } else {
                 setErrorMessage("Brak połączenia z serwerem.");
             }
+            setIsFormSubmittedSuccessfully(false);
         }
     };
 
     return (
         <div className={classes.wrapper}>
-            {errorMessage && <div className={classes.errorBox}>{errorMessage}</div>}
+            {errorMessage && 
+                <div className={`${classes.messageBox} ${isFormSubmittedSuccessfully ? classes.messageSuccess : classes.messageError}`}>
+                    {errorMessage}
+                </div>
+            }
             <form onSubmit={handleSubmit} className={classes.form} >
                 <div className={classes.inputContainer}>
                     <label htmlFor="password">Email:</label>
