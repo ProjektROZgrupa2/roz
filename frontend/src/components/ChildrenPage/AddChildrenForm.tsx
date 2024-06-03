@@ -110,13 +110,20 @@ const MessageModal = ({ isOpen, message, isSuccess, onClose, }: { isOpen: boolea
 
 const AddChildrenForm = ( { isOpen, onClose, onChildAdded }: { isOpen: boolean, onClose: () => void, onChildAdded: () => void } ) => {
     const classes = useStyles();
-    const { register, handleSubmit, formState: { errors }, reset } = useForm();
+    const { register, handleSubmit, formState: { errors, isValid }, reset } = useForm({ mode: 'onChange'});
     const [page, setPage] = useState(1);
     const [isMessageModalOpen, setMessageModalOpen] = useState(false);
     const [message, setMessage] = useState('');
     const [isSuccess, setIsSuccess] = useState(false);
 
     const onSubmit = async (data : any) => {
+        if (!isValid) {
+            setMessage('Formularz jest nieprawidłowo wypełniony');
+            setIsSuccess(false);
+            setMessageModalOpen(true);
+            return;
+        }
+
         try {
             const formData = new FormData();
             for (const key in data) {
@@ -171,10 +178,10 @@ const AddChildrenForm = ( { isOpen, onClose, onChildAdded }: { isOpen: boolean, 
                                 label="Imię"
                                 register={register('name', { 
                                     required: true,
-                                    maxLength: { value: 50, message: 'Maksymalna długość to 50 znaków' },
+                                    maxLength: 50,
                                 })}
                                 error={!!errors.name}
-                                errorMessage='To pole jest wymagane'
+                                errorMessage={errors.name?.message as string || 'Podaj poprawne dane (maksymalnie 50 znaków)'}
                                 type="text"
                             />
                             <InputField
@@ -184,17 +191,17 @@ const AddChildrenForm = ( { isOpen, onClose, onChildAdded }: { isOpen: boolean, 
                                     maxLength: 50, 
                                 })}
                                 error={!!errors.surname}
-                                errorMessage="To pole jest wymagane"
+                                errorMessage={errors.surname?.message as string || 'Podaj poprawne dane (maksymalnie 50 znaków)'}
                                 type="text"
                             />
                             <InputField
                                 label="Data urodzenia"
                                 register={register('dateOfBirth', { 
                                     required: true,
-                                    pattern: /^\d{2}-\d{2}-\d{4}$/,
+                                    pattern: /^\d{4}-\d{2}-\d{2}$/,
                                 })}
                                 error={!!errors.dateOfBirth}
-                                errorMessage="To pole jest wymagane (format: dd-mm-yyyy)"
+                                errorMessage={errors.dateOfBirth?.message as string || 'Podaj poprawną datę (yyyy-mm-dd)'}
                                 type="date"
                             />
                             <InputField
@@ -204,17 +211,17 @@ const AddChildrenForm = ( { isOpen, onClose, onChildAdded }: { isOpen: boolean, 
                                     maxLength: 50,
                                 })}
                                 error={!!errors.placeOfBirth}
-                                errorMessage="To pole jest wymagane"
+                                errorMessage={errors.placeOfBirth?.message as string || 'Podaj poprawne dane (maksymalnie 50 znaków)'}
                                 type="text"
                             />
                             <InputField
                                 label="Data przyjęcia"
-                                register={register('dateOfBirth', { 
+                                register={register('dateOfAdmission', { 
                                     required: true,
-                                    pattern: /^\d{2}-\d{2}-\d{4}$/,
+                                    pattern: /^\d{4}-\d{2}-\d{2}$/,
                                 })}
                                 error={!!errors.dateOfAdmission}
-                                errorMessage="To pole jest wymagane (format: dd-mm-yyyy)"
+                                errorMessage={errors.dateOfAdmission?.message as string || 'Podaj poprawną datę (yyyy-mm-dd)'}
                                 type="date"
                             />
                             <InputField
@@ -224,7 +231,7 @@ const AddChildrenForm = ( { isOpen, onClose, onChildAdded }: { isOpen: boolean, 
                                     maxLength: 30, 
                                 })}
                                 error={!!errors.referralNumber}
-                                errorMessage="To pole jest wymagane"
+                                errorMessage={errors.referralNumber?.message as string || 'Podaj poprawne dane (maksymalnie 30 znaków)'}
                                 type="text"
                             />
                             <button type="button" className={`${classes.button} ${classes.cancelBtn}`} onClick={handleClose}>Anuluj</button>
@@ -244,7 +251,7 @@ const AddChildrenForm = ( { isOpen, onClose, onChildAdded }: { isOpen: boolean, 
                                     maxLength: 50,
                                 })}
                                 error={!!errors.mother}
-                                errorMessage="To pole jest wymagane"
+                                errorMessage={errors.mother?.message as string || 'Podaj poprawne dane (maksymalnie 50 znaków)'}
                                 type="text"
                             />
                             <InputField
@@ -254,7 +261,7 @@ const AddChildrenForm = ( { isOpen, onClose, onChildAdded }: { isOpen: boolean, 
                                     maxLength: 50,
                                 })}
                                 error={!!errors.father}
-                                errorMessage="To pole jest wymagane"
+                                errorMessage={errors.father?.message as string || 'Podaj poprawne dane (maksymalnie 50 znaków)'}
                                 type="text"
                             />
                             <InputField
@@ -264,7 +271,7 @@ const AddChildrenForm = ( { isOpen, onClose, onChildAdded }: { isOpen: boolean, 
                                     maxLength: 50, 
                                 })}
                                 error={!!errors.legalGuardian}
-                                errorMessage="To pole jest wymagane"
+                                errorMessage={errors.legalGuardian?.message as string || 'Podaj poprawne dane (maksymalnie 50 znaków)'}
                                 type="text"
                             />
                             <InputField
@@ -273,19 +280,20 @@ const AddChildrenForm = ( { isOpen, onClose, onChildAdded }: { isOpen: boolean, 
                                      required: true,
                                      pattern: /^\d+$/,
                                      max: 20,
+                                     min: 0,
                                 })}
                                 error={!!errors.siblings}
-                                errorMessage="To pole jest wymagane"
+                                errorMessage={errors.siblings?.message as string || 'Podaj poprawną liczbę rodzeństwa'}
                                 type="number"
                             />
                             <InputField
                                 label="Uwagi"
                                 register={register('comments', { 
-                                    required: true,
+                                    required: false,
                                     maxLength: 200,
                                 })}
                                 error={!!errors.comments}
-                                errorMessage="To pole jest wymagane"
+                                errorMessage={errors.comments?.message as string || 'Podaj maksymalnie 200 znaków'}
                                 type="textarea"
                             />
                             <InputField

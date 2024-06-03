@@ -15,7 +15,7 @@ class Children(models.Model):
     surname = models.CharField(max_length=60, blank=False, null=False )
     dateOfBirth = models.DateField(auto_now_add=False, blank=False, null=False)
     placeOfBirth = models.CharField(max_length=60, blank=False, null=False)
-    dateOfAdmission  = models.DateTimeField(auto_now_add=False, blank=False, null=False)
+    dateOfAdmission  = models.DateField(auto_now_add=False, blank=False, null=False)
     referralNumber = models.CharField(max_length=60)
     mother = models.CharField(max_length=60, blank=False, null=False)
     father = models.CharField(max_length=60, blank=False, null=False)
