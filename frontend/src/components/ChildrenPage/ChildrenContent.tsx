@@ -232,7 +232,7 @@ const ChildrenContent = ({ refreshKey, onAddChild }: { refreshKey: number, onAdd
     const [sortOrder, setSortOrder] = useState(true);
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [children, setChildren] = useState<Child[]>([]);
-    const [selectedChild, setSelectedChild] = useState<Child | null>(null); // Nowy stan
+    const [selectedChild, setSelectedChild] = useState<Child | null>(null); 
 
     const openModal = (child: Child) => {
         setSelectedChild(child);
@@ -294,13 +294,15 @@ const ChildrenContent = ({ refreshKey, onAddChild }: { refreshKey: number, onAdd
     const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
+
         if (selectedChild) {
-            formData.append('childId', selectedChild.id.toString());
+            formData.append('title', `${selectedChild.name}${selectedChild.surname}`);
         }
+        formData.append('content', "uploaded_file");
 
         console.log('FormData przed wysłaniem:', Array.from(formData.entries()));
 
-        axios.post('http://localhost:8000/api/uploadDocument/', formData)
+        axios.post('http://localhost:8000/api/posts/', formData)
             .then(response => {
                 console.log('Document uploaded successfully:', response.data);
                 closeModal();
@@ -354,7 +356,7 @@ const ChildrenContent = ({ refreshKey, onAddChild }: { refreshKey: number, onAdd
                     <button onClick={closeModal} className={classes.modalCloseButton}>&times;</button>
                 </div>
                 <form className={classes.modalForm} onSubmit={handleFormSubmit}>
-                    <input type="file" name="document" required />
+                    <input type="file" name="file" required />
                     <button type="submit" className={classes.modalButton}>Prześlij</button>
                 </form>
             </Modal>
