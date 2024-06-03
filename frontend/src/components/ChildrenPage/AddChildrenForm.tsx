@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createUseStyles } from "react-jss";
 import Modal from "react-modal";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import axios from 'axios';
 import InputField from './InputField';
 import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
@@ -140,10 +140,10 @@ const AddChildrenForm = ( { isOpen, onClose, onChildAdded }: { isOpen: boolean, 
             setMessageModalOpen(true);
         } catch (error) {
             handleClose();
-            setMessage('Nie udało się dodać dziecka');
+            setMessage((error as any).response.data.message || 'Nie udało się dodać dziecka');
             setIsSuccess(false);
             setMessageModalOpen(true);
-          }
+        }
     };
 
       const handleClose = () => {

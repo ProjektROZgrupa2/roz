@@ -1,5 +1,4 @@
-import axios, { AxiosError } from 'axios';
-import {useEffect, useState} from "react";
+import axios from "axios";
 
 export const registerUser = async (email: string, password: string) => {
 
@@ -38,17 +37,17 @@ export const loginUser = async (email: string, password: string) => {
 
             return { success: true };
         } else {
-            return { success: false, message: response.data.detail || 'Network Error.1' };
+            return { success: false, message: response.data.detail || 'Nie udało się zalogować. Proszę sprawdzić dane.' };
         }
     } catch (error) {
         console.log(error);
         if (axios.isAxiosError(error)) {
             if (!error.response) {
-                return { success: false, message: 'Network Error.2' };
+                return { success: false, message: 'Błąd sieci. Proszę sprawdzić połączenie.' };
             }
-            return { success: false, message: error.response?.data.detail || 'Network Error3.' };
+            return { success: false, message: error.response?.data.detail || 'Błąd serwera. Proszę spróbować później.' };
         }
-        return { success: false, message: 'Network Error4.' };
+        return { success: false, message: 'Nieoczekiwany błąd. Proszę spróbować później.' };
     }
 };
 
@@ -95,10 +94,10 @@ export const changePassword = async (oldPassword: string, newPassword: string) =
         console.error('Error:', error);
         if (axios.isAxiosError(error)) {
             if (!error.response) {
-                return { success: false, message: 'Network Error' };
+                return { success: false, message: 'Błąd sieci. Proszę spróbować później.' };
             }
-            return { success: false, message: error.response.data.detail || 'Error while changing password' };
+            return { success: false, message: error.response.data.detail || 'Wystąpił błąd w trakcie zmieniania hasła. Proszę spróbować później.' };
         }
-        return { success: false, message: 'Error while changing password' };
+        return { success: false, message: 'Wystąpił błąd w trakcie zmieniania hasła. Proszę spróbować później.' };
     }
 };

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { FcGoogle } from 'react-icons/fc';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../../services/UserService';
 
@@ -115,11 +114,10 @@ const navigate = useNavigate();
         setIsAuth(true);
         navigate('/home');
       } else {
-          const errorMessage = response.message || 'Nieprawidłowy email lub hasło.';
-          setLoginError(errorMessage);
+        setLoginError('Niepoprawne login lub hasło. Spróbuj ponownie.');
       }
     } catch (error) {
-      if ((error as Error).message === 'Network Error.6') {
+      if ((error as Error).message === 'Brak połączenia. Spróbuj ponownie później.') {
         setLoginError('Brak połączenia. Spróbuj ponownie później.');
       } else {
         setLoginError('Wystąpił błąd podczas weryfikacji danych. Spróbuj ponownie później.');
