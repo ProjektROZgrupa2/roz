@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { createUseStyles } from "react-jss";
 import defaultImage from '../../assets/defaultImage.svg';
+import Modal from 'react-modal';
 
 const useStyles = createUseStyles({
     wrapper: {
@@ -14,7 +15,7 @@ const useStyles = createUseStyles({
         width: '100%',
     },
     button: {
-        width: "100px",
+        width: "150px",
         padding: "10px",
         margin: "5px 0",
         borderRadius: "5px",
@@ -30,16 +31,27 @@ const useStyles = createUseStyles({
             backgroundColor: "#161A30",
         },
     },
-    menuButtons: {
+    sortButtons: {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         gap: '1rem',
     },
     addButton: {
-        width: "50px",
-        height: "50px",
-        borderRadius: "50%",
+        width: "150px",
+        margin: "15px 0",
+        backgroundColor: "#B6BBC4",
+        color: "#31304D",
+        "&:hover": {
+            backgroundColor: "#31304D",
+            color: "#B6BBC4",
+        },
+    },
+    buttons: {
+        display: 'flex',
+        flexDirection: 'column', 
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     childrenGrid: {
         display: 'grid',
@@ -65,12 +77,6 @@ const useStyles = createUseStyles({
             boxShadow: '0 0 20px 0 rgba(0, 0, 0, 0.2)', 
         },
     },
-    childImg: {
-        width: '10vw',
-        height: '10vw',
-        borderRadius: '50%',
-        objectFit: 'cover',
-    },
     searchBar: {
         width: '80%',
         padding: '10px',
@@ -88,6 +94,7 @@ const useStyles = createUseStyles({
     sortButton: {
         width: "200px",
         padding: "10px",
+        margin: "10px 0",
         borderRadius: "5px",
         border: "1px solid #ccc",
         backgroundColor: "#31304D",
@@ -109,13 +116,84 @@ const useStyles = createUseStyles({
         wrapper: {
             marginTop: '200px',
         },
-        menuButtons: {
+        sortButtons: {
             flexDirection: 'column',
+        }
+    },
+    modalContent: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 'auto',
+        maxHeight: '80vh',
+        width: '80%',
+        maxWidth: '600px',
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        backgroundColor: '#31304D',
+        color: 'white',
+        borderRadius: '20px',
+        padding: '2rem',
+        boxShadow: '0 5px 15px rgba(0, 0, 0, 0.3)',
+        overflowY: 'auto',
+    },
+    modalHeader: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        borderBottom: '1px solid #ccc',
+        paddingBottom: '1.2rem',
+        marginBottom: '1rem',
+    },
+    modalTitle: {
+        margin: 0,
+        fontSize: '1.5rem',
+    },
+    modalCloseButton: {
+        background: 'none',
+        border: 'none',
+        color: 'white',
+        fontSize: '1.5rem',
+        cursor: 'pointer',
+        transition: 'color 0.3s ease',
+        '&:hover': {
+            color: '#ff4c4c',
         },
-        childImg: {
-            width: '25vw',
-            height: '25vw',
+    },
+    modalForm: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        gap: '1rem',
+        margin: '2rem 0',
+        width: '100%',
+    },
+    modalButton: {
+        padding: '10px 20px',
+        marginTop: '1rem',
+        backgroundColor: '#B6BBC4',
+        color: '#31304D',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'pointer',
+        transition: 'background-color 0.3s ease, color 0.3s ease',
+        '&:hover': {
+            backgroundColor: '#31304D',
+            color: '#B6BBC4',
         },
+    },
+    overlay: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        zIndex: 1000,
     },
 });
 
@@ -123,14 +201,10 @@ interface Child {
     id: number;
     name: string;
     surname: string;
-    dateOfBirth: string; 
-    image: string; 
+    dateOfBirth: string;
+    image: string;
     dateOfAdmission: string;
 }
-
-const serverUrl = 'http://localhost:8000';
-
-const getImageUrl = (imageName: string) => `${serverUrl}/${imageName}`;
 
 function calculateAge(dateOfBirth: string): number {
     const dob = new Date(dateOfBirth);
@@ -138,7 +212,8 @@ function calculateAge(dateOfBirth: string): number {
     today.setHours(0, 0, 0, 0);
 
     if (dob > today) {
-        return 0;}
+        return 0;
+    }
 
     let age = today.getFullYear() - dob.getFullYear();
     const m = today.getMonth() - dob.getMonth();
@@ -152,20 +227,31 @@ function calculateAge(dateOfBirth: string): number {
 
 const ChildrenContent = ({ refreshKey, onAddChild }: { refreshKey: number, onAddChild: () => void }) => {
     const classes = useStyles();
-    const [searchTerm, setSearchTerm] = useState(''); 
+    const [searchTerm, setSearchTerm] = useState('');
     const [alphaSortOrder, setAlphaSortOrder] = useState(true);
-    const [sortOrder, setSortOrder] = useState(true); 
-
+    const [sortOrder, setSortOrder] = useState(true);
+    const [modalIsOpen, setModalIsOpen] = useState(false);
     const [children, setChildren] = useState<Child[]>([]);
+    const [selectedChild, setSelectedChild] = useState<Child | null>(null); 
+
+    const openModal = (child: Child) => {
+        setSelectedChild(child);
+        setModalIsOpen(true);
+    };
+
+    const closeModal = () => {
+        setModalIsOpen(false);
+        setSelectedChild(null);
+    };
 
     useEffect(() => {
         axios.get('http://localhost:8000/api/addChild/')
-        .then(response => {
-            setChildren(response.data);
-        })
-        .catch(error => {
-            console.error('Błąd pobierania listy dzieci:', error);
-        });
+            .then(response => {
+                setChildren(response.data);
+            })
+            .catch(error => {
+                console.error('Błąd pobierania listy dzieci:', error);
+            });
     }, [refreshKey]);
 
     const handleSort = () => {
@@ -205,34 +291,75 @@ const ChildrenContent = ({ refreshKey, onAddChild }: { refreshKey: number, onAdd
         setChildren(sortedChildren);
     };
 
+    const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+
+        if (selectedChild) {
+            formData.append('title', `${selectedChild.name}${selectedChild.surname}`);
+        }
+        formData.append('content', "uploaded_file");
+
+        console.log('FormData przed wysłaniem:', Array.from(formData.entries()));
+
+        axios.post('http://localhost:8000/api/posts/', formData)
+            .then(response => {
+                console.log('Document uploaded successfully:', response.data);
+                closeModal();
+            })
+            .catch(error => {
+                console.error('Error uploading document:', error);
+            });
+    };
+
     return (
         <div className={classes.wrapper}>
             <h1>Lista dzieci</h1>
-            <div className={classes.menuButtons}>
-                <input
-                    type="text"
-                    placeholder="Szukaj po imieniu lub nazwisku"
-                    value={searchTerm}
-                    onChange={event => setSearchTerm(event.target.value)}
-                    className={classes.searchBar}
-                />
-                <button className={classes.sortButton} onClick={handleSort}>Sortuj po wieku</button>
-                <button className={classes.sortButton} onClick={handleAlphaSort}>Sortuj alfabetycznie</button>
-                <button className={classes.sortButton} onClick={handleDateSort}>Sortuj po dacie przyjęcia</button>
-                <button className={`${classes.button} ${classes.addButton}`} onClick={onAddChild}>+</button>                
+            <input
+                type="text"
+                placeholder="Szukaj po imieniu lub nazwisku"
+                value={searchTerm}
+                onChange={event => setSearchTerm(event.target.value)}
+                className={classes.searchBar}
+            />
+            <div className={classes.buttons}>
+                <div className={classes.sortButtons}>
+                    <button className={classes.sortButton} onClick={handleSort}>Sortuj po wieku</button>
+                    <button className={classes.sortButton} onClick={handleAlphaSort}>Sortuj alfabetycznie</button>
+                    <button className={classes.sortButton} onClick={handleDateSort}>Sortuj po dacie przyjęcia</button>
+                </div>
+                <div>
+                    <button className={`${classes.button} ${classes.addButton}`} onClick={onAddChild}>Dodaj dziecko</button>
+                </div>
             </div>
             <div className={classes.childrenGrid}>
                 {filteredChildren.map(child => (
                     <div key={child.id} className={classes.childCard}>
-                        <img className={classes.childImg} src={child.image ? getImageUrl(child.image) : defaultImage} alt={`${child.name} ${child.surname}`} />
+                        <img src={child.image || defaultImage} alt={`${child.name} ${child.surname}`} />
                         <h2>{child.name} {child.surname}</h2>
                         <p>Wiek: {calculateAge(child.dateOfBirth)}</p>
-                        <div className={classes.menuButtons}>
-                            <button className={classes.button}>Szczegóły</button>
+                        <div className={classes.buttons}>
+                            <button className={classes.button} onClick={() => openModal(child)}>Dodaj dokument</button>
                         </div>
                     </div>
                 ))}
             </div>
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={closeModal}
+                contentLabel="Add Document Modal"
+                className={classes.modalContent}
+                overlayClassName={classes.overlay}
+            >
+                <div className={classes.modalHeader}>
+                    <h2 className={classes.modalTitle}>Dodaj dokument</h2>
+                    <button onClick={closeModal} className={classes.modalCloseButton}>&times;</button>
+                </div>
+                <form className={classes.modalForm} onSubmit={handleFormSubmit}>
+                    <input type="file" name="file" required />
+                    <button type="submit" className={classes.modalButton}>Prześlij</button>
+                </form>
+            </Modal>
         </div>
     );
 };
