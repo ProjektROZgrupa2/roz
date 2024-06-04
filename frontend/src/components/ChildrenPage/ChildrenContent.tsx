@@ -77,6 +77,12 @@ const useStyles = createUseStyles({
             boxShadow: '0 0 20px 0 rgba(0, 0, 0, 0.2)', 
         },
     },
+    childImg: {
+        width: '10vw',
+        height: '10vw',
+        borderRadius: '50%',
+        objectFit: 'cover',
+    },
     searchBar: {
         width: '80%',
         padding: '10px',
@@ -205,6 +211,9 @@ interface Child {
     image: string;
     dateOfAdmission: string;
 }
+
+const serverUrl = 'http://localhost:8000';
+const getImageUrl = (imageName: string) => `${serverUrl}/${imageName}`;
 
 function calculateAge(dateOfBirth: string): number {
     const dob = new Date(dateOfBirth);
@@ -335,7 +344,7 @@ const ChildrenContent = ({ refreshKey, onAddChild }: { refreshKey: number, onAdd
             <div className={classes.childrenGrid}>
                 {filteredChildren.map(child => (
                     <div key={child.id} className={classes.childCard}>
-                        <img src={child.image || defaultImage} alt={`${child.name} ${child.surname}`} />
+                        <img className={classes.childImg} src={child.image ? getImageUrl(child.image) : defaultImage} alt={`${child.name} ${child.surname}`} />
                         <h2>{child.name} {child.surname}</h2>
                         <p>Wiek: {calculateAge(child.dateOfBirth)}</p>
                         <div className={classes.buttons}>
