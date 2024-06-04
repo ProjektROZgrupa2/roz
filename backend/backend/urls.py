@@ -23,10 +23,9 @@ urlpatterns = [
             jwt_views.TokenRefreshView.as_view(), 
             name='token_refresh'),
       path('api/logout/', main_views.LogoutView.as_view(), name='logout'),
-      path('add_children/', main_views.add_children_view, name='add_children'),
-      # path('api/children/', main_views.get_children_view, name='get_children'),
       path('api/addChild/', main_views.ChildrenView.as_view(), name='addChild'),
       path('api/change_password/', main_views.ChangePasswordView.as_view(), name='change_password'),
+      path('api/posts/', main_views.PostView.as_view(), name= 'posts_list'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

@@ -1,18 +1,22 @@
 from rest_framework import viewsets, status, views
-from .models import Main, Children
-from .serializers import ChangePasswordSerializer, MainSerializer, LoginSerializer, UserSerializer, ChildrenSerializer
+from .models import *
+from .serializers import *
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from rest_framework.response import Response
 from django.http import HttpResponse
-from .utils import add_children
+from .utils import upload_to_google_drive
 from rest_framework.parsers import MultiPartParser, FormParser
+import os
+from decouple import Config
+from dotenv import find_dotenv
+import json
 
-def add_children_view(request):
-    add_children()
-    return HttpResponse("Przykładowe dane zostały dodane do bazy.")
+dotenv_path = find_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
+
+config = Config(dotenv_path)
 
 
 class ChildrenView(APIView):
@@ -96,4 +100,28 @@ class ChangePasswordView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class PostView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    GOOGLE_DRIVE_FOLDER_ID = config('GOOGLE_DRIVE_FOLDER_ID')
+    GOOGLE_SERVICE_ACCOUNT = config('GOOGLE_SERVICE_ACCOUNT')
 
+    def get(self, request, *args, **kwargs):
+        posts = Post.objects.all()
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, *args, **kwargs):
+        posts_serializer = PostSerializer(data=request.data)
+        if posts_serializer.is_valid():
+            post = posts_serializer.save()
+
+            files = request.FILES.getlist('file')  
+            print("Files: ", files)
+            title = request.data.get('title')
+            for file in files:
+                upload_to_google_drive(file, self.GOOGLE_DRIVE_FOLDER_ID, self.GOOGLE_SERVICE_ACCOUNT, title)
+
+            return Response(posts_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print('error', posts_serializer.errors)
+            return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
