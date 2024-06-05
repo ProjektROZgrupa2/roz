@@ -76,6 +76,8 @@ const useStyles = createUseStyles({
     padding: "0.3rem",
     borderRadius: "5px",
     inlineSize: "max-content",
+    fontWeight: "bold",
+    color: "rgba(0, 0, 0)",
   },
   searchBar: {
     width: "80%",
@@ -110,9 +112,8 @@ const useStyles = createUseStyles({
 });
 
 interface Catalog {
-  id: number;
-  name: string;
-  description: string;
+  file: string;
+  folder: string;
 }
 
 const CatalogList = () => {
@@ -120,11 +121,12 @@ const CatalogList = () => {
   const [catalogs, setCatalogs] = useState<Catalog[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDocumentsModalOpen, setIsDocumentsModalOpen] = useState(false);
+  const [selectedCatalog, setSelectedCatalog] = useState("");
 
   useEffect(() => {
     const fetchCatalogs = async () => {
       try {
-        const response = await axios.get("/api/children/");
+        const response = await axios.get("/api/files/");
         setCatalogs(response.data);
       } catch (error) {
         console.error("Error fetching catalogs:", error);
@@ -134,7 +136,8 @@ const CatalogList = () => {
     fetchCatalogs();
   }, []);
 
-  const showDocumentsModal = () => {
+  const showDocumentsModal = (folder: string) => {
+    setSelectedCatalog(folder);
     setIsDocumentsModalOpen(true);
   };
 
@@ -142,8 +145,14 @@ const CatalogList = () => {
     setIsDocumentsModalOpen(false);
   };
 
+  const sortAlphabetically = () => {
+    setCatalogs((prevCatalogs) =>
+      [...prevCatalogs].sort((a, b) => a.folder.localeCompare(b.folder))
+    );
+  };
+
   const filteredCatalogs = catalogs.filter((catalog) =>
-    catalog.name.toLowerCase().includes(searchTerm.toLowerCase())
+    catalog.folder.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -157,24 +166,52 @@ const CatalogList = () => {
           onChange={(event) => setSearchTerm(event.target.value)}
           className={classes.searchBar}
         />
-        <button className={classes.sortButton}>Sortuj alfabetycznie</button>
-        <button className={classes.sortButton}>Sortuj po dacie</button>
-        {/* <button className={`${classes.button} ${classes.addButton}`} onClick={onAddChild}>+</button>                 */}
+        <button className={classes.sortButton} onClick={sortAlphabetically}>
+          Sortuj alfabetycznie
+        </button>
       </div>
       <DocumentsModal
         isOpen={isDocumentsModalOpen}
         onRequestClose={hideDocumentsModal}
+        folder={selectedCatalog}
       />
       <div className={classes.catalogsGrid}>
-        {filteredCatalogs.map((catalog) => (
+        {filteredCatalogs.map((catalog, index) => (
           <div
-            key={catalog.id}
+            key={index}
             className={classes.catalogCard}
-            onClick={showDocumentsModal}
+            onClick={() => showDocumentsModal(catalog.folder)}
           >
-            <div className={classes.catalogName}>{catalog.name}</div>
+            <div className={classes.catalogName}>{catalog.folder}</div>
           </div>
         ))}
+        <div className={classes.catalogCard}>
+          <div className={classes.catalogName}>Joanna Nowak</div>
+        </div>
+        <div className={classes.catalogCard}>
+          <div className={classes.catalogName}>Joanna Nowak</div>
+        </div>
+        <div className={classes.catalogCard}>
+          <div className={classes.catalogName}>Joanna Nowak</div>
+        </div>
+        <div className={classes.catalogCard}>
+          <div className={classes.catalogName}>Joanna Nowak</div>
+        </div>
+        <div className={classes.catalogCard}>
+          <div className={classes.catalogName}>Joanna Nowak</div>
+        </div>
+        <div className={classes.catalogCard}>
+          <div className={classes.catalogName}>Joanna Nowak</div>
+        </div>
+        <div className={classes.catalogCard}>
+          <div className={classes.catalogName}>Joanna Nowak</div>
+        </div>
+        <div className={classes.catalogCard}>
+          <div className={classes.catalogName}>Joanna Nowak</div>
+        </div>
+        <div className={classes.catalogCard}>
+          <div className={classes.catalogName}>Joanna Nowak</div>
+        </div>
       </div>
     </div>
   );
