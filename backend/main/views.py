@@ -7,12 +7,13 @@ from rest_framework.authtoken.models import Token
 from rest_framework import status
 from rest_framework.response import Response
 from django.http import HttpResponse
-from .utils import upload_to_google_drive
+from .utils import get_files_for_child, upload_to_google_drive
 from rest_framework.parsers import MultiPartParser, FormParser
 import os
 from decouple import Config
 from dotenv import find_dotenv
 import json
+from .utils import get_all_files
 
 dotenv_path = find_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
 
@@ -125,3 +126,19 @@ class PostView(APIView):
         else:
             print('error', posts_serializer.errors)
             return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AllFilesView(APIView):
+    def get(self, request, *args, **kwargs):
+        credentials_json = config('GOOGLE_SERVICE_ACCOUNT')
+        files_with_folders = get_all_files(credentials_json)
+        return Response(files_with_folders)
+    
+class ChildFilesView(APIView):
+    def get(self, request, *args, **kwargs):
+        child_name = request.query_params.get('child_name')
+        if not child_name:
+            return Response({"error": "Child name is required"}, status=400)
+
+        credentials_json = config('GOOGLE_SERVICE_ACCOUNT')
+        files_for_child = get_files_for_child(child_name, credentials_json)
+        return Response(files_for_child)

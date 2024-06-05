@@ -52,3 +52,44 @@ def upload_to_google_drive(file, folder_id, credentials_json, title):
     os.remove(temp_credentials_path)
 
     return uploaded_file.get('id')
+
+def get_all_files(credentials_json):
+    credentials_info = json.loads(credentials_json)
+    credentials = service_account.Credentials.from_service_account_info(credentials_info)
+    service = build('drive', 'v3', credentials=credentials)
+
+    query = "mimeType != 'application/vnd.google-apps.folder' and trashed=false"
+    results = service.files().list(q=query, spaces='drive', fields='files(id, name, parents)').execute()
+    files = results.get('files', [])
+
+    folders = service.files().list(q="mimeType='application/vnd.google-apps.folder' and trashed=false",
+                                   spaces='drive', fields='files(id, name)').execute()
+    folder_dict = {folder['id']: folder['name'] for folder in folders.get('files', [])}
+
+    files_with_folders = []
+    for file in files:
+        folder_name = folder_dict.get(file['parents'][0], 'No Folder')
+        files_with_folders.append({'file': file['name'], 'folder': folder_name})
+
+    return files_with_folders
+import logging
+
+logger = logging.getLogger(__name__)
+def get_files_for_child(child_name, credentials_json):
+    credentials_info = json.loads(credentials_json)
+    credentials = service_account.Credentials.from_service_account_info(credentials_info)
+    service = build('drive', 'v3', credentials=credentials)
+
+    query = f"name='{child_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false"
+    results = service.files().list(q=query, spaces='drive', fields='files(id)').execute()
+    folders = results.get('files', [])
+
+    if not folders:
+        return []
+
+    folder_id = folders[0]['id']
+    query = f"'{folder_id}' in parents and mimeType != 'application/vnd.google-apps.folder' and trashed=false"
+    results = service.files().list(q=query, spaces='drive', fields='files(id, name)').execute()
+    files = results.get('files', [])
+
+    return [{'file': file['name'], 'folder': child_name} for file in files]
