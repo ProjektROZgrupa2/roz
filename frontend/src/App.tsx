@@ -1,11 +1,13 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Navigate, Routes } from 'react-router-dom';
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./container/Home";
-import LandingPage  from "./container/LandingPage";
+import LandingPage from "./container/LandingPage";
 import Login from "./container/Login";
 import Register from "./container/Register";
 import Children from './container/Children';
 import Settings from './container/Settings';
+import Documents from "./container/Documents";
+import Calendar from './container/Calendar';
 import { useEffect, useState } from 'react';
 
 
@@ -36,6 +38,8 @@ const App = () => {
                 <Route path="/register" element={!isAuth ? <Register /> : <Home />} />
                 <Route path="/home" element={isAuth ? <Home /> : <LandingPage />} />
                 <Route path="/children" element={isAuth ? <Children /> : <LandingPage />} />
+                <Route path="/documents" element={isAuth ? <Documents /> : <LandingPage />} />
+                <Route path="/calendar" element={isAuth ? <Calendar /> : <LandingPage />} />
                 <Route path="/settings" element={isAuth ? <Settings /> : <LandingPage />} />
             </Routes>
         </Router>

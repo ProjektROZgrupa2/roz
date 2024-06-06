@@ -1,138 +1,99 @@
-from .models import Children
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
+from google.oauth2 import service_account
+import tempfile
+import os
+import json
+from decouple import config
 
-def add_children():
-    children_data = [
-        {
-            'name': 'Anna',
-            'surname': 'Nowak',
-            'date_of_birth': '2018-03-15',
-            'place_of_bitrh': 'Kraków',
-            'date_of_admission': '2022-01-10',
-            'referral_number': '789012',
-            'mother': 'Maria Nowak',
-            'father': 'Piotr Nowak',
-            'legal_guardian': 'Tomasz Kowalski',  
-            'siblings': 0,
-            'notes': 'Anna jest naszym najmłodszym pacjentem.',
-        },
-        {
-            'name': 'Mateusz',
-            'surname': 'Kowalczyk',
-            'date_of_birth': '2016-07-25',
-            'place_of_bitrh': 'Warszawa',
-            'date_of_admission': '2022-02-05',
-            'referral_number': '345678',
-            'mother': 'Anna Kowalczyk',
-            'father': 'Adam Kowalczyk',
-            'legal_guardian': 'Marta Wiśniewska',  
-            'siblings': 2,
-            'notes': 'Mateusz uwielbia zabawki z klocków.',
-        },
-        {
-            'name': 'Kasia',
-            'surname': 'Dąbrowska',
-            'date_of_birth': '2019-11-10',
-            'place_of_bitrh': 'Poznań',
-            'date_of_admission': '2022-03-20',
-            'referral_number': '234567',
-            'mother': 'Magda Dąbrowska',
-            'father': 'Tomasz Dąbrowski',
-            'legal_guardian': 'Monika Lewandowska',  
-            'siblings': 1,
-            'notes': 'Kasia uwielbia spacery po parku.',
-        },
-        {
-            'name': 'Piotrek',
-            'surname': 'Woźniak',
-            'date_of_birth': '2017-09-20',
-            'place_of_bitrh': 'Gdańsk',
-            'date_of_admission': '2022-04-02',
-            'referral_number': '456789',
-            'mother': 'Aleksandra Woźniak',
-            'father': 'Kamil Woźniak',
-            'legal_guardian': 'Ewa Zając',  
-            'siblings': 0,
-            'notes': 'Piotrek lubi malować obrazki.',
-        },
-        {
-            'name': 'Julia',
-            'surname': 'Kaczmarek',
-            'date_of_birth': '2018-12-05',
-            'place_of_bitrh': 'Łódź',
-            'date_of_admission': '2022-05-15',
-            'referral_number': '567890',
-            'mother': 'Karolina Kaczmarek',
-            'father': 'Bartosz Kaczmarek',
-            'legal_guardian': 'Jolanta Nowak',  
-            'siblings': 2,
-            'notes': 'Julia uwielbia czytać bajki.',
-        },
-        {
-        'name': 'Maciek',
-        'surname': 'Wojciechowski',
-        'date_of_birth': '2017-05-12',
-        'place_of_bitrh': 'Wrocław',
-        'date_of_admission': '2022-06-20',
-        'referral_number': '678901',
-        'mother': 'Agnieszka Wojciechowska',
-        'father': 'Marcin Wojciechowski',
-        'legal_guardian': 'Monika Kowalczyk', 
-        'siblings': 1,
-        'notes': 'Maciek lubi grać w piłkę nożną.',
-    },
-    {
-        'name': 'Zuzia',
-        'surname': 'Nowakowska',
-        'date_of_birth': '2019-08-28',
-        'place_of_bitrh': 'Katowice',
-        'date_of_admission': '2022-07-10',
-        'referral_number': '789012',
-        'mother': 'Magdalena Nowakowska',
-        'father': 'Krzysztof Nowakowski',
-        'legal_guardian': 'Wojciech Jankowski',  
-        'siblings': 0,
-        'notes': 'Zuzia uwielbia zwierzęta.',
-    },
-    {
-        'name': 'Ola',
-        'surname': 'Jasińska',
-        'date_of_birth': '2018-02-14',
-        'place_of_bitrh': 'Szczecin',
-        'date_of_admission': '2022-08-05',
-        'referral_number': '890123',
-        'mother': 'Aneta Jasińska',
-        'father': 'Tadeusz Jasiński',
-        'legal_guardian': 'Katarzyna Kaczmarek',  
-        'siblings': 2,
-        'notes': 'Ola lubi rysować i malować.',
-    },
-    {
-        'name': 'Michał',
-        'surname': 'Lis',
-        'date_of_birth': '2016-11-30',
-        'place_of_bitrh': 'Gdynia',
-        'date_of_admission': '2022-09-15',
-        'referral_number': '901234',
-        'mother': 'Ewa Lis',
-        'father': 'Paweł Lis',
-        'legal_guardian': 'Anna Lewicka',  
-        'siblings': 1,
-        'notes': 'Michał uwielbia grać na pianinie.',
-    },
-    {
-        'name': 'Kacper',
-        'surname': 'Szymański',
-        'date_of_birth': '2017-07-18',
-        'place_of_bitrh': 'Kraków',
-        'date_of_admission': '2022-10-20',
-        'referral_number': '012345',
-        'mother': 'Małgorzata Szymańska',
-        'father': 'Adam Szymański',
-        'legal_guardian': 'Wioletta Wiśniewska', 
-        'siblings': 0,
-        'notes': 'Kacper uwielbia zabawki samochodowe.',
-    },
-    ]
+def upload_to_google_drive(file, folder_id, credentials_json, title):
+    credentials_info = json.loads(credentials_json)
+    
+    with tempfile.NamedTemporaryFile(delete=False) as temp_credentials_file:
+        temp_credentials_file.write(json.dumps(credentials_info).encode())
+        temp_credentials_file.flush()
+        temp_credentials_path = temp_credentials_file.name
 
-    for data in children_data:
-        Children.objects.create(**data)
+    credentials = service_account.Credentials.from_service_account_file(temp_credentials_path)
+    service = build('drive', 'v3', credentials=credentials)
+
+    query = f"'{folder_id}' in parents and mimeType='application/vnd.google-apps.folder' and name='{title}' and trashed=false"
+    results = service.files().list(q=query, spaces='drive', fields='files(id, name)').execute()
+    items = results.get('files', [])
+
+    if not items:
+        file_metadata = {
+            'name': title,
+            'mimeType': 'application/vnd.google-apps.folder',
+            'parents': [folder_id]
+        }
+        folder = service.files().create(body=file_metadata, fields='id').execute()
+        folder_id = folder.get('id')
+    else:
+        folder_id = items[0].get('id')
+
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        for chunk in file.chunks():
+            temp_file.write(chunk)
+        temp_file_path = temp_file.name
+
+    file_metadata = {
+        'name': file.name,
+        'parents': [folder_id]
+    }
+    media = MediaFileUpload(temp_file_path, resumable=True)
+    uploaded_file = service.files().create(
+        body=file_metadata,
+        media_body=media,
+        fields='id'
+    ).execute()
+
+    os.remove(temp_file_path)
+    os.remove(temp_credentials_path)
+
+    return uploaded_file.get('id')
+
+def get_all_files(credentials_json):
+    credentials_info = json.loads(credentials_json)
+    credentials = service_account.Credentials.from_service_account_info(credentials_info)
+    service = build('drive', 'v3', credentials=credentials)
+
+    query = "mimeType != 'application/vnd.google-apps.folder' and trashed=false"
+    results = service.files().list(q=query, spaces='drive', fields='files(id, name, parents)').execute()
+    files = results.get('files', [])
+
+    folders = service.files().list(q="mimeType='application/vnd.google-apps.folder' and trashed=false",
+                                   spaces='drive', fields='files(id, name, parents)').execute()
+    folder_dict = {folder['id']: folder['name'] for folder in folders.get('files', [])}
+
+    files_with_folders = []
+    for file in files:
+        folder_name = 'No Folder'
+        if 'parents' in file and file['parents']:
+            folder_name = folder_dict.get(file['parents'][0], 'No Folder')
+        if folder_name != 'No Folder':
+            files_with_folders.append({'file': file['name'], 'folder': folder_name})
+
+    return files_with_folders
+
+import logging
+
+logger = logging.getLogger(__name__)
+def get_files_for_child(child_name, credentials_json):
+    credentials_info = json.loads(credentials_json)
+    credentials = service_account.Credentials.from_service_account_info(credentials_info)
+    service = build('drive', 'v3', credentials=credentials)
+
+    query = f"name='{child_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false"
+    results = service.files().list(q=query, spaces='drive', fields='files(id)').execute()
+    folders = results.get('files', [])
+
+    if not folders:
+        return []
+
+    folder_id = folders[0]['id']
+    query = f"'{folder_id}' in parents and mimeType != 'application/vnd.google-apps.folder' and trashed=false"
+    results = service.files().list(q=query, spaces='drive', fields='files(id, name)').execute()
+    files = results.get('files', [])
+
+    return [{'file': file['name'], 'id': file['id'], 'folder': child_name} for file in files]

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Main, Children
+from .models import *
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
@@ -65,9 +65,13 @@ class ChildrenSerializer(serializers.ModelSerializer):
 
     def create(self, vaidated_data):
         children = Children.objects.create(**vaidated_data)
-        print("children z create: ", children)
         return children
     
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
+
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = '__all__'
