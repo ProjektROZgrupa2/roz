@@ -49,7 +49,7 @@ const useStyles = createUseStyles({
     },
     buttons: {
         display: 'flex',
-        flexDirection: 'column', 
+        flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -68,13 +68,13 @@ const useStyles = createUseStyles({
         gap: '1rem',
         padding: '1rem',
         backgroundColor: '#F0ECE5',
-        borderRadius: '10px', 
-        boxShadow: '0 0 15px 0 rgba(0, 0, 0, 0.1)', 
+        borderRadius: '10px',
+        boxShadow: '0 0 15px 0 rgba(0, 0, 0, 0.1)',
         textAlign: 'center',
-        transition: 'transform 0.3s ease', 
+        transition: 'transform 0.3s ease',
         "&:hover": {
             transform: 'scale(1.05)',
-            boxShadow: '0 0 20px 0 rgba(0, 0, 0, 0.2)', 
+            boxShadow: '0 0 20px 0 rgba(0, 0, 0, 0.2)',
         },
     },
     childImg: {
@@ -88,13 +88,13 @@ const useStyles = createUseStyles({
         padding: '10px',
         margin: '10px 0',
         borderRadius: '5px',
-        border: 'none', 
-        boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.1)', 
-        fontSize: '1rem', 
-        transition: 'box-shadow 0.3s ease', 
+        border: 'none',
+        boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.1)',
+        fontSize: '1rem',
+        transition: 'box-shadow 0.3s ease',
         '&:focus': {
-            outline: 'none', 
-            boxShadow: '0 0 15px 0 rgba(0, 0, 0, 0.2)', 
+            outline: 'none',
+            boxShadow: '0 0 15px 0 rgba(0, 0, 0, 0.2)',
         },
     },
     sortButton: {
@@ -114,7 +114,6 @@ const useStyles = createUseStyles({
             backgroundColor: "#161A30",
         },
     },
-    
     '@media (max-width: 768px)': {
         childrenGrid: {
             gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -145,6 +144,10 @@ const useStyles = createUseStyles({
         padding: '2rem',
         boxShadow: '0 5px 15px rgba(0, 0, 0, 0.3)',
         overflowY: 'auto',
+        transition: 'opacity 0.5s ease, transform 0.5s ease',
+        '&:focus': {
+            outline: 'none',
+        },
     },
     modalHeader: {
         display: 'flex',
@@ -172,11 +175,27 @@ const useStyles = createUseStyles({
     },
     modalForm: {
         display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        gap: '1rem',
-        margin: '2rem 0',
+        flexDirection: 'row',
+        gap: '2rem',
         width: '100%',
+    },
+    modalDetails: {
+        flex: 1,
+    },
+    modalImage: {
+        display: 'block',
+        width: '150px',
+        height: '150px',
+        borderRadius: '10px',
+        objectFit: 'cover',
+        boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
+        transition: 'transform 0.3s ease',
+        '&:hover': {
+            transform: 'scale(1.1)',
+        },
+        '@media (max-width: 768px)': {
+            display: 'none',
+        },
     },
     modalButton: {
         padding: '10px 20px',
@@ -201,6 +220,36 @@ const useStyles = createUseStyles({
         backgroundColor: 'rgba(0, 0, 0, 0.75)',
         zIndex: 1000,
     },
+    detailsContainer: {
+        width: '100%',
+        backgroundColor: '#B6BBC4',
+        borderRadius: '10px',
+        padding: '1rem',
+        color: '#31304D',
+    },
+    detailsItem: {
+        marginBottom: '0.5rem',
+        '&:last-child': {
+            marginBottom: 0,
+        },
+    },
+    detailsLabel: {
+        fontWeight: 'bold',
+    },
+    uploadContainer: {
+        width: '100%',
+        backgroundColor: '#F0ECE5',
+        borderRadius: '10px',
+        padding: '1rem',
+        marginTop: '1rem',
+    },
+    fileInput: {
+        width: '100%',
+        padding: '10px',
+        marginBottom: '1rem',
+        borderRadius: '5px',
+        border: '1px solid #ccc',
+    },
 });
 
 interface Child {
@@ -208,8 +257,15 @@ interface Child {
     name: string;
     surname: string;
     dateOfBirth: string;
-    image: string;
+    placeOfBirth: string;
     dateOfAdmission: string;
+    referralNumber: string;
+    mother: string;
+    father: string;
+    legalGuardian: string;
+    siblings: number;
+    comments: string;
+    image: string;
 }
 
 const serverUrl = 'http://localhost:8000';
@@ -225,23 +281,29 @@ function calculateAge(dateOfBirth: string): number {
     }
 
     let age = today.getFullYear() - dob.getFullYear();
-    const m = today.getMonth() - dob.getMonth();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    const dayDiff = today.getDate() - dob.getDate();
 
-    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
         age--;
     }
 
     return age;
 }
 
-const ChildrenContent = ({ refreshKey, onAddChild }: { refreshKey: number, onAddChild: () => void }) => {
+interface Props {
+    onAddChild: () => void;
+    refreshKey: number;
+}
+
+const ChildrenContent: React.FC<Props> = ({ onAddChild, refreshKey }) => {
     const classes = useStyles();
-    const [searchTerm, setSearchTerm] = useState('');
-    const [alphaSortOrder, setAlphaSortOrder] = useState(true);
-    const [sortOrder, setSortOrder] = useState(true);
-    const [modalIsOpen, setModalIsOpen] = useState(false);
     const [children, setChildren] = useState<Child[]>([]);
-    const [selectedChild, setSelectedChild] = useState<Child | null>(null); 
+    const [searchTerm, setSearchTerm] = useState('');
+    const [sortOrder, setSortOrder] = useState(true);
+    const [alphaSortOrder, setAlphaSortOrder] = useState(true);
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [selectedChild, setSelectedChild] = useState<Child | null>(null);
 
     const openModal = (child: Child) => {
         setSelectedChild(child);
@@ -348,7 +410,7 @@ const ChildrenContent = ({ refreshKey, onAddChild }: { refreshKey: number, onAdd
                         <h2>{child.name} {child.surname}</h2>
                         <p>Wiek: {calculateAge(child.dateOfBirth)}</p>
                         <div className={classes.buttons}>
-                            <button className={classes.button} onClick={() => openModal(child)}>Dodaj dokument</button>
+                            <button className={classes.button} onClick={() => openModal(child)}>Szczegóły</button>
                         </div>
                     </div>
                 ))}
@@ -356,18 +418,40 @@ const ChildrenContent = ({ refreshKey, onAddChild }: { refreshKey: number, onAdd
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
-                contentLabel="Add Document Modal"
+                contentLabel="Details Modal"
                 className={classes.modalContent}
                 overlayClassName={classes.overlay}
             >
                 <div className={classes.modalHeader}>
-                    <h2 className={classes.modalTitle}>Dodaj dokument</h2>
+                    <h2 className={classes.modalTitle}>Szczegóły dziecka</h2>
                     <button onClick={closeModal} className={classes.modalCloseButton}>&times;</button>
                 </div>
-                <form className={classes.modalForm} onSubmit={handleFormSubmit}>
-                    <input type="file" name="file" required />
-                    <button type="submit" className={classes.modalButton}>Prześlij</button>
-                </form>
+                {selectedChild && (
+                    <div className={classes.modalForm}>
+                        <img className={classes.modalImage} src={selectedChild.image ? getImageUrl(selectedChild.image) : defaultImage} alt={`${selectedChild.name} ${selectedChild.surname}`} />
+                        <div className={classes.modalDetails}>
+                            <div className={classes.detailsContainer}>
+                                <p className={classes.detailsItem}><span className={classes.detailsLabel}>Imię:</span> {selectedChild.name}</p>
+                                <p className={classes.detailsItem}><span className={classes.detailsLabel}>Nazwisko:</span> {selectedChild.surname}</p>
+                                <p className={classes.detailsItem}><span className={classes.detailsLabel}>Data urodzenia:</span> {selectedChild.dateOfBirth}</p>
+                                <p className={classes.detailsItem}><span className={classes.detailsLabel}>Miejsce urodzenia:</span> {selectedChild.placeOfBirth}</p>
+                                <p className={classes.detailsItem}><span className={classes.detailsLabel}>Data przyjęcia:</span> {selectedChild.dateOfAdmission}</p>
+                                <p className={classes.detailsItem}><span className={classes.detailsLabel}>Numer skierowania:</span> {selectedChild.referralNumber}</p>
+                                <p className={classes.detailsItem}><span className={classes.detailsLabel}>Matka:</span> {selectedChild.mother}</p>
+                                <p className={classes.detailsItem}><span className={classes.detailsLabel}>Ojciec:</span> {selectedChild.father}</p>
+                                <p className={classes.detailsItem}><span className={classes.detailsLabel}>Opiekun prawny:</span> {selectedChild.legalGuardian}</p>
+                                <p className={classes.detailsItem}><span className={classes.detailsLabel}>Liczba rodzeństwa:</span> {selectedChild.siblings}</p>
+                                <p className={classes.detailsItem}><span className={classes.detailsLabel}>Komentarze:</span> {selectedChild.comments}</p>
+                            </div>
+                            <div className={classes.uploadContainer}>
+                                <form onSubmit={handleFormSubmit}>
+                                    <input type="file" name="file" required className={classes.fileInput} />
+                                    <button type="submit" className={classes.modalButton}>Dodaj dokument</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </Modal>
         </div>
     );
