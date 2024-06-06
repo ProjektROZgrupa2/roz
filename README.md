@@ -41,6 +41,9 @@ Aby uruchomić ten projekt lokalnie, należy skonfigurować plik `.env`. Plik `.
 - `PGADMIN_PORT`: Port dla PgAdmin.
 - `BACKEND_PORT`: Port dla backendu aplikacji.
 - `FRONTEND_PORT`: Port dla frontendu aplikacji.
+- `REACT_APP_GOOGLE_API_KEY`: Klucz API Google.
+- `GOOGLE_DRIVE_FOLDER_ID`: ID folderu Google Drive.
+- `GOOGLE_SERVICE_ACCOUNT`: Plik JSON z danymi konta usługi Google.
 
 **Przykład**:
 
@@ -57,8 +60,17 @@ Aby uruchomić ten projekt lokalnie, należy skonfigurować plik `.env`. Plik `.
 - `PGADMIN_PORT`: `5050:80`
 - `BACKEND_PORT`: `8000`
 - `FRONTEND_PORT`: `3000`
+- `GOOGLE_DRIVE_FOLDER_ID`: `mygoogledrivefolderid123`
+- `GOOGLE_SERVICE_ACCOUNT`: `service_account.json`
 
-Po wypełnieniu pliku `.env` można uruchomić projekt zgodnie z instrukcjami w sekcji "Uruchomienie projektu".
+**Ważne**
+Aby pobieranie plików z dysku działało poprawnie należy w katalogu frontend utworzyć nowy plik .env w którym będzie:
+
+- `REACT_APP_GOOGLE_API_KEY`: `przyklad123`
+
+Klucz należy uzyskać z platformy google cloud i włączyć interfejs Google Drive API
+
+Po wypełnieniu plików `.env` można uruchomić projekt zgodnie z instrukcjami w sekcji "Uruchomienie projektu".
 
 ## Uruchomienie projektu
 

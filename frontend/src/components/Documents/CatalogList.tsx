@@ -126,8 +126,15 @@ const CatalogList = () => {
   useEffect(() => {
     const fetchCatalogs = async () => {
       try {
-        const response = await axios.get("/api/files/");
-        setCatalogs(response.data);
+        const response = await axios.get("http://localhost:8000/api/files/");
+        const uniqueFolders = Array.from(
+          new Set(response.data.map((catalog: Catalog) => catalog.folder))
+        ).map((folder) => {
+          return response.data.find(
+            (catalog: Catalog) => catalog.folder === folder
+          )!;
+        });
+        setCatalogs(uniqueFolders);
       } catch (error) {
         console.error("Error fetching catalogs:", error);
       }
@@ -154,6 +161,10 @@ const CatalogList = () => {
   const filteredCatalogs = catalogs.filter((catalog) =>
     catalog.folder.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const splitName = (name: string) => {
+    return name.replace(/([a-z])([A-Z])/g, "$1 $2");
+  };
 
   return (
     <div className={classes.wrapper}>
@@ -182,36 +193,11 @@ const CatalogList = () => {
             className={classes.catalogCard}
             onClick={() => showDocumentsModal(catalog.folder)}
           >
-            <div className={classes.catalogName}>{catalog.folder}</div>
+            <div className={classes.catalogName}>
+              {splitName(catalog.folder)}
+            </div>
           </div>
         ))}
-        <div className={classes.catalogCard}>
-          <div className={classes.catalogName}>Joanna Nowak</div>
-        </div>
-        <div className={classes.catalogCard}>
-          <div className={classes.catalogName}>Joanna Nowak</div>
-        </div>
-        <div className={classes.catalogCard}>
-          <div className={classes.catalogName}>Joanna Nowak</div>
-        </div>
-        <div className={classes.catalogCard}>
-          <div className={classes.catalogName}>Joanna Nowak</div>
-        </div>
-        <div className={classes.catalogCard}>
-          <div className={classes.catalogName}>Joanna Nowak</div>
-        </div>
-        <div className={classes.catalogCard}>
-          <div className={classes.catalogName}>Joanna Nowak</div>
-        </div>
-        <div className={classes.catalogCard}>
-          <div className={classes.catalogName}>Joanna Nowak</div>
-        </div>
-        <div className={classes.catalogCard}>
-          <div className={classes.catalogName}>Joanna Nowak</div>
-        </div>
-        <div className={classes.catalogCard}>
-          <div className={classes.catalogName}>Joanna Nowak</div>
-        </div>
       </div>
     </div>
   );

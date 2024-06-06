@@ -63,15 +63,19 @@ def get_all_files(credentials_json):
     files = results.get('files', [])
 
     folders = service.files().list(q="mimeType='application/vnd.google-apps.folder' and trashed=false",
-                                   spaces='drive', fields='files(id, name)').execute()
+                                   spaces='drive', fields='files(id, name, parents)').execute()
     folder_dict = {folder['id']: folder['name'] for folder in folders.get('files', [])}
 
     files_with_folders = []
     for file in files:
-        folder_name = folder_dict.get(file['parents'][0], 'No Folder')
-        files_with_folders.append({'file': file['name'], 'folder': folder_name})
+        folder_name = 'No Folder'
+        if 'parents' in file and file['parents']:
+            folder_name = folder_dict.get(file['parents'][0], 'No Folder')
+        if folder_name != 'No Folder':
+            files_with_folders.append({'file': file['name'], 'folder': folder_name})
 
     return files_with_folders
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -92,4 +96,4 @@ def get_files_for_child(child_name, credentials_json):
     results = service.files().list(q=query, spaces='drive', fields='files(id, name)').execute()
     files = results.get('files', [])
 
-    return [{'file': file['name'], 'folder': child_name} for file in files]
+    return [{'file': file['name'], 'id': file['id'], 'folder': child_name} for file in files]
